@@ -45,6 +45,25 @@ document.addEventListener('DOMContentLoaded', () => {
   style.textContent = '.is-visible { opacity: 1 !important; transform: translateY(0) !important; }';
   document.head.appendChild(style);
 
+  // --- FAQ Accordion ---
+  document.querySelectorAll('.faq-question').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const isOpen = btn.getAttribute('aria-expanded') === 'true';
+      // Close all
+      document.querySelectorAll('.faq-question').forEach(b => {
+        b.setAttribute('aria-expanded', 'false');
+        const ans = b.nextElementSibling;
+        if (ans) ans.classList.remove('is-open');
+      });
+      // Toggle clicked
+      if (!isOpen) {
+        btn.setAttribute('aria-expanded', 'true');
+        const ans = btn.nextElementSibling;
+        if (ans) ans.classList.add('is-open');
+      }
+    });
+  });
+
   // --- Header scroll shadow ---
   const header = document.querySelector('.site-header');
   if (header) {
