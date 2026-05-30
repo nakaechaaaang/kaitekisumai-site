@@ -7,9 +7,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (hamburger && globalNav) {
     hamburger.addEventListener('click', () => {
-      hamburger.classList.toggle('is-open');
-      globalNav.classList.toggle('is-open');
-      document.body.style.overflow = globalNav.classList.contains('is-open') ? 'hidden' : '';
+      const isOpen = hamburger.classList.toggle('is-open');
+      globalNav.classList.toggle('is-open', isOpen);
+      hamburger.setAttribute('aria-expanded', String(isOpen));
+      hamburger.setAttribute('aria-label', isOpen ? 'メニューを閉じる' : 'メニューを開く');
+      document.body.style.overflow = isOpen ? 'hidden' : '';
     });
 
     // Close menu when a nav link is clicked
@@ -17,33 +19,36 @@ document.addEventListener('DOMContentLoaded', () => {
       link.addEventListener('click', () => {
         hamburger.classList.remove('is-open');
         globalNav.classList.remove('is-open');
+        hamburger.setAttribute('aria-expanded', 'false');
+        hamburger.setAttribute('aria-label', 'メニューを開く');
         document.body.style.overflow = '';
       });
     });
   }
 
   // --- Scroll animation (fade-in) ---
-  const observerOptions = { threshold: 0.15, rootMargin: '0px 0px -40px 0px' };
-  const fadeObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('is-visible');
-        fadeObserver.unobserve(entry.target);
-      }
+  // Skip entirely for users who prefer reduced motion, and degrade gracefully
+  // if IntersectionObserver is unsupported (content stays fully visible).
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fadeTargets = document.querySelectorAll('.service-card, .point-item, .news-item, .contact-box, .company-row');
+
+  if (!prefersReducedMotion && 'IntersectionObserver' in window) {
+    const fadeObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          fadeObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+    fadeTargets.forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(24px)';
+      el.style.transition = 'opacity .6s ease, transform .6s ease';
+      fadeObserver.observe(el);
     });
-  }, observerOptions);
-
-  document.querySelectorAll('.service-card, .point-item, .news-item, .contact-box, .company-row').forEach(el => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(24px)';
-    el.style.transition = 'opacity .6s ease, transform .6s ease';
-    fadeObserver.observe(el);
-  });
-
-  // Add visible styles
-  const style = document.createElement('style');
-  style.textContent = '.is-visible { opacity: 1 !important; transform: translateY(0) !important; }';
-  document.head.appendChild(style);
+  }
 
   // --- FAQ Accordion ---
   document.querySelectorAll('.faq-question').forEach(btn => {
@@ -68,11 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const header = document.querySelector('.site-header');
   if (header) {
     window.addEventListener('scroll', () => {
-      if (window.scrollY > 10) {
-        header.style.boxShadow = '0 2px 20px rgba(0,0,0,.1)';
-      } else {
-        header.style.boxShadow = '0 2px 12px rgba(0,0,0,.06)';
-      }
+      header.classList.toggle('is-scrolled', window.scrollY > 10);
     }, { passive: true });
   }
 });
