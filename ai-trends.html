@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIの盛り上がりの歴史とトレンド｜3度のAIブームを図解</title>
+  <meta name="description" content="第1次〜第3次AIブームと、2022年からの生成AIブームの流れをグラフで解説。過去のAI冬の時代と、現在のトレンドをわかりやすく図解します。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --c-bg:#f6f9fc; --c-text:#26323d; --c-sub:#5b6b78;
+      --c-accent:#1f8a8a; --c-accent2:#f0a020;
+      --c-line:#e2e9ef; --c-card:#ffffff;
+      --boom1:#7bc6c6; --boom2:#f3b95f; --boom3:#5a8def; --boomNow:#e0556b;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:"Noto Sans JP",sans-serif; color:var(--c-text);
+      background:var(--c-bg); line-height:1.8; -webkit-font-smoothing:antialiased;
+    }
+    .wrap{max-width:1000px; margin:0 auto; padding:0 20px}
+    header.page-head{
+      background:linear-gradient(120deg,#1f8a8a 0%, #2a6fb0 100%);
+      color:#fff; padding:64px 20px 56px; text-align:center;
+    }
+    .page-head .en{font-family:"Poppins",sans-serif; letter-spacing:.18em; font-size:.8rem; opacity:.85}
+    .page-head h1{font-size:1.9rem; font-weight:900; margin:.4em 0 .3em; line-height:1.4}
+    .page-head p{font-size:.98rem; opacity:.92; max-width:640px; margin:0 auto}
+    section{padding:48px 0}
+    h2.sec-title{
+      font-size:1.4rem; font-weight:900; margin-bottom:.2em;
+      padding-left:.6em; border-left:6px solid var(--c-accent);
+    }
+    h2.sec-title .sub{display:block; font-size:.72rem; font-weight:600; color:var(--c-accent); font-family:"Poppins",sans-serif; letter-spacing:.12em; padding-left:.1em; margin-bottom:.2em}
+    .lead{color:var(--c-sub); margin:14px 0 28px; font-size:.97rem}
+    .chart-card{
+      background:var(--c-card); border-radius:16px; padding:24px 18px 16px;
+      box-shadow:0 8px 30px rgba(40,70,90,.08);
+    }
+    .chart-title{font-weight:700; font-size:1.02rem; margin-bottom:4px}
+    .chart-note{font-size:.8rem; color:var(--c-sub); margin-bottom:14px}
+    canvas{width:100%; height:auto; display:block}
+    .legend{display:flex; flex-wrap:wrap; gap:14px; margin-top:14px; font-size:.82rem}
+    .legend span{display:inline-flex; align-items:center; gap:6px; color:var(--c-sub)}
+    .legend i{width:14px; height:14px; border-radius:4px; display:inline-block}
+    /* timeline cards */
+    .eras{display:grid; gap:18px; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); margin-top:8px}
+    .era{background:var(--c-card); border-radius:14px; padding:20px; box-shadow:0 6px 22px rgba(40,70,90,.07); border-top:5px solid}
+    .era.b1{border-color:var(--boom1)} .era.b2{border-color:var(--boom2)}
+    .era.b3{border-color:var(--boom3)} .era.bn{border-color:var(--boomNow)}
+    .era .yr{font-family:"Poppins",sans-serif; font-weight:700; font-size:.85rem; color:var(--c-sub)}
+    .era h3{font-size:1.08rem; margin:.2em 0 .5em}
+    .era p{font-size:.88rem; color:var(--c-sub)}
+    .era .key{font-size:.82rem; margin-top:10px; color:var(--c-text)}
+    .era .key b{color:#1f8a8a}
+    /* trend list */
+    .trends{display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+    .trend{background:var(--c-card); border-radius:12px; padding:18px 20px; box-shadow:0 6px 22px rgba(40,70,90,.07)}
+    .trend h3{font-size:1rem; margin-bottom:.3em; display:flex; align-items:center; gap:8px}
+    .trend h3 .dot{width:10px;height:10px;border-radius:50%;background:var(--c-accent2)}
+    .trend p{font-size:.87rem; color:var(--c-sub)}
+    table.milestones{width:100%; border-collapse:collapse; background:var(--c-card); border-radius:12px; overflow:hidden; box-shadow:0 6px 22px rgba(40,70,90,.07); font-size:.9rem}
+    table.milestones th,table.milestones td{padding:12px 14px; text-align:left; border-bottom:1px solid var(--c-line)}
+    table.milestones th{background:#eef5f5; font-weight:700; width:120px; color:#1f8a8a; font-family:"Poppins",sans-serif}
+    table.milestones tr:last-child td{border-bottom:none}
+    .takeaway{background:#fff7e8; border:1px solid #f3d79b; border-radius:14px; padding:22px 24px}
+    .takeaway h3{font-size:1.05rem; margin-bottom:.4em; color:#b5760a}
+    .takeaway ul{margin-left:1.1em; font-size:.92rem; color:#5b4a2a}
+    .takeaway li{margin:.3em 0}
+    footer{background:#26323d; color:#9fb0bc; text-align:center; padding:28px 20px; font-size:.82rem; margin-top:40px}
+    .src{font-size:.78rem; color:var(--c-sub); margin-top:18px}
+    @media(max-width:560px){ .page-head h1{font-size:1.45rem} }
+  </style>
+</head>
+<body>
+  <header class="page-head">
+    <p class="en">AI BOOM &amp; TRENDS</p>
+    <h1>AIの盛り上がりの歴史とトレンド</h1>
+    <p>いまの「AIブーム」は、実は3度目。過去のブームと"冬の時代"、そして2022年からの生成AIの波までを、グラフでわかりやすく整理しました。</p>
+  </header>
+
+  <main class="wrap">
+    <!-- ===== メイングラフ ===== -->
+    <section>
+      <h2 class="sec-title"><span class="sub">OVERVIEW</span>AIの注目度の移り変わり（1950→現在）</h2>
+      <p class="lead">研究の活発さ・投資・社会的な注目度を一本の線でイメージ化したものです。山が「ブーム」、谷が「冬の時代（資金・関心が冷え込んだ時期）」を表します。</p>
+      <div class="chart-card">
+        <div class="chart-title">AIの盛り上がり曲線</div>
+        <div class="chart-note">縦軸＝注目度・投資の勢い（イメージ）／横軸＝年代</div>
+        <canvas id="waveChart" width="940" height="420" aria-label="AIブームの推移グラフ"></canvas>
+        <div class="legend">
+          <span><i style="background:#7bc6c6"></i>第1次ブーム</span>
+          <span><i style="background:#f3b95f"></i>第2次ブーム</span>
+          <span><i style="background:#5a8def"></i>第3次ブーム</span>
+          <span><i style="background:#e0556b"></i>生成AIブーム</span>
+          <span><i style="background:#c9d3da"></i>冬の時代</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 4つの時代 ===== -->
+    <section>
+      <h2 class="sec-title"><span class="sub">HISTORY</span>4つの波で読み解くAIの歴史</h2>
+      <p class="lead">過去のブームは「期待が先行 → 技術の限界に直面 → 冬の時代」を繰り返してきました。それぞれの主役技術を見ると流れがわかります。</p>
+      <div class="eras">
+        <div class="era b1">
+          <div class="yr">1956 – 1960年代</div>
+          <h3>第1次AIブーム</h3>
+          <p>「探索」と「推論」の時代。コンピュータが迷路やパズルを解き、人間のように考える機械への期待が高まりました。</p>
+          <p class="key"><b>主役：</b>探索・推論／ダートマス会議（1956）でAIが命名<br><b>限界：</b>簡単な問題しか解けず → 第1次冬の時代へ</p>
+        </div>
+        <div class="era b2">
+          <div class="yr">1980年代</div>
+          <h3>第2次AIブーム</h3>
+          <p>専門家の知識をルール化した「エキスパートシステム」が実用化。日本も「第五世代コンピュータ」に巨額投資しました。</p>
+          <p class="key"><b>主役：</b>知識表現・エキスパートシステム<br><b>限界：</b>知識の入力・維持に膨大なコスト → 第2次冬の時代へ</p>
+        </div>
+        <div class="era b3">
+          <div class="yr">2012 – 2021年</div>
+          <h3>第3次AIブーム</h3>
+          <p>大量のデータから自動で学ぶ「ディープラーニング（深層学習）」が画像認識で大ブレイク。AIが一気に実用段階へ。</p>
+          <p class="key"><b>主役：</b>機械学習・深層学習<br><b>転機：</b>AlexNet（2012）、AlphaGoが囲碁王者に勝利（2016）</p>
+        </div>
+        <div class="era bn">
+          <div class="yr">2022年 – 現在</div>
+          <h3>生成AIブーム</h3>
+          <p>文章・画像・音声を"作り出す"AIが誰でも使える形に。ChatGPTの登場で社会全体が一気に動き出しました。</p>
+          <p class="key"><b>主役：</b>大規模言語モデル（LLM）・生成AI<br><b>転機：</b>ChatGPT公開（2022.11）、GPT-4など高性能モデルが続々</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 生成AIの普及スピード ===== -->
+    <section>
+      <h2 class="sec-title"><span class="sub">SPEED</span>今回のブームは「普及スピード」が桁違い</h2>
+      <p class="lead">ChatGPTはわずか2か月でユーザー1億人に到達したと言われ、過去のどのサービスより速い普及を見せました（参考値・イメージ）。</p>
+      <div class="chart-card">
+        <div class="chart-title">利用者1億人到達までにかかった月数（少ないほど速い）</div>
+        <div class="chart-note">※各種公開情報を基にしたおおよその目安です</div>
+        <canvas id="barChart" width="940" height="360" aria-label="1億人到達までの月数の比較グラフ"></canvas>
+      </div>
+    </section>
+
+    <!-- ===== いまのトレンド ===== -->
+    <section>
+      <h2 class="sec-title"><span class="sub">TRENDS</span>いま注目されているAIトレンド</h2>
+      <div class="trends">
+        <div class="trend"><h3><span class="dot"></span>生成AI（テキスト・画像）</h3><p>チャット、文章作成、画像・動画生成など。仕事や創作の現場で日常的に使われ始めています。</p></div>
+        <div class="trend"><h3><span class="dot"></span>マルチモーダルAI</h3><p>文字・画像・音声・動画をまとめて扱えるAI。写真を見て説明したり、声で対話したりが可能に。</p></div>
+        <div class="trend"><h3><span class="dot"></span>AIエージェント</h3><p>指示を受けて自分で手順を考え、複数の作業を自動でこなすAI。次の大きな波として期待されています。</p></div>
+        <div class="trend"><h3><span class="dot"></span>業務・産業への実装</h3><p>カスタマー対応、医療、製造、介護など、現場業務へ組み込む動きが本格化しています。</p></div>
+        <div class="trend"><h3><span class="dot"></span>小型・軽量モデル</h3><p>スマホや手元の端末で動く軽いAI。コストやプライバシー面のメリットから注目度が上昇。</p></div>
+        <div class="trend"><h3><span class="dot"></span>AIのルール・安全性</h3><p>著作権・誤情報・倫理など、賢く安全に使うためのルール作りが世界中で進んでいます。</p></div>
+      </div>
+    </section>
+
+    <!-- ===== 主な出来事 ===== -->
+    <section>
+      <h2 class="sec-title"><span class="sub">MILESTONES</span>知っておきたい主な出来事</h2>
+      <table class="milestones">
+        <tr><th>1956</th><td>ダートマス会議で「AI（人工知能）」という言葉が誕生（第1次ブームの始まり）</td></tr>
+        <tr><th>1980年代</th><td>エキスパートシステムが実用化、第2次ブームへ</td></tr>
+        <tr><th>1997</th><td>IBMのディープ・ブルーがチェス世界王者に勝利</td></tr>
+        <tr><th>2012</th><td>ディープラーニングが画像認識で圧勝（AlexNet）→ 第3次ブーム本格化</td></tr>
+        <tr><th>2016</th><td>AlphaGoが囲碁のトップ棋士に勝利</td></tr>
+        <tr><th>2017</th><td>「Transformer」技術が登場、いまの生成AIの土台に</td></tr>
+        <tr><th>2022.11</th><td>ChatGPT公開。生成AIが一般に広まり「生成AIブーム」へ</td></tr>
+        <tr><th>2023〜</th><td>高性能モデルが各社から続々登場、社会実装が一気に加速</td></tr>
+      </table>
+    </section>
+
+    <!-- ===== まとめ ===== -->
+    <section>
+      <div class="takeaway">
+        <h3>ここがポイント</h3>
+        <ul>
+          <li>いまのAIの盛り上がりは <b>3度目（厳密には生成AIで第3次の新しい波）</b>。過去には2度の「冬の時代」があった。</li>
+          <li>過去のブームは「期待が先行しすぎて技術が追いつかず失速」した。一方<b>今回は実際に使える成果が出ている</b>のが大きな違い。</li>
+          <li>キーワードは <b>生成AI → マルチモーダル → AIエージェント</b> へと進化中。</li>
+          <li>普及スピードが極めて速く、<b>「便利さ」と「安全なルール作り」の両立</b>が今後のテーマ。</li>
+        </ul>
+      </div>
+      <p class="src">※グラフの数値は、AIの歴史やサービス普及に関する各種公開情報を基にした「イメージ・目安」です。正確な統計値ではなく、流れを直感的に理解するためのものです。</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>AIの盛り上がりの歴史とトレンド｜参考資料として作成</p>
+  </footer>
+
+  <script>
+  // ===== 共通：高解像度対応 =====
+  function setupCanvas(canvas){
+    const dpr = window.devicePixelRatio || 1;
+    const cssW = canvas.clientWidth || canvas.width;
+    const ratio = canvas.height / canvas.width;
+    const cssH = cssW * ratio;
+    canvas.style.height = cssH + 'px';
+    canvas.width = cssW * dpr;
+    canvas.height = cssH * dpr;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    return { ctx, w: cssW, h: cssH };
+  }
+
+  // ===== グラフ1：AIブームの波 =====
+  function drawWave(){
+    const canvas = document.getElementById('waveChart');
+    const { ctx, w, h } = setupCanvas(canvas);
+    const padL=46, padR=20, padT=24, padB=42;
+    const plotW = w-padL-padR, plotH = h-padT-padB;
+    const yearMin=1950, yearMax=2026;
+    const X = y => padL + (y-yearMin)/(yearMax-yearMin)*plotW;
+    const Y = v => padT + (1-v)*plotH; // v:0..1
+
+    // 注目度カーブの制御点 [year, value]
+    const pts=[
+      [1950,0.05],[1956,0.30],[1961,0.55],[1965,0.40],   // 第1次
+      [1974,0.10],[1980,0.12],                            // 冬1
+      [1985,0.62],[1988,0.70],[1990,0.50],               // 第2次
+      [1995,0.15],[2005,0.12],                            // 冬2
+      [2012,0.55],[2016,0.72],[2020,0.80],               // 第3次
+      [2022,0.92],[2024,1.0],[2026,0.98]                 // 生成AI
+    ];
+
+    // 背景の年代グリッド
+    ctx.strokeStyle='#eef2f5'; ctx.lineWidth=1; ctx.fillStyle='#9aa8b2';
+    ctx.font='11px "Poppins",sans-serif'; ctx.textAlign='center';
+    for(let yr=1950; yr<=2020; yr+=10){
+      ctx.beginPath(); ctx.moveTo(X(yr),padT); ctx.lineTo(X(yr),padT+plotH); ctx.stroke();
+      ctx.fillText(yr, X(yr), padT+plotH+18);
+    }
+    ctx.fillText('現在', X(2026), padT+plotH+18);
+
+    // ブーム帯（背景の色つき領域）
+    const bands=[
+      [1956,1968,'rgba(123,198,198,.18)','第1次'],
+      [1983,1992,'rgba(243,185,95,.18)','第2次'],
+      [2012,2021,'rgba(90,141,239,.16)','第3次'],
+      [2022,2026,'rgba(224,85,107,.14)','生成AI']
+    ];
+    ctx.textAlign='center';
+    bands.forEach(b=>{
+      ctx.fillStyle=b[2];
+      ctx.fillRect(X(b[0]),padT, X(b[1])-X(b[0]), plotH);
+      ctx.fillStyle='#6b7884'; ctx.font='bold 11px "Noto Sans JP"';
+      ctx.fillText(b[3], (X(b[0])+X(b[1]))/2, padT+14);
+    });
+    // 冬の時代ラベル
+    ctx.fillStyle='#aab4bc'; ctx.font='11px "Noto Sans JP"';
+    ctx.fillText('冬の時代', (X(1970)+X(1980))/2, padT+plotH-8);
+    ctx.fillText('冬の時代', (X(1996)+X(2006))/2, padT+plotH-8);
+
+    // なめらかな曲線（Catmull-Rom → ベジェ）
+    function smooth(p){
+      ctx.beginPath();
+      ctx.moveTo(X(p[0][0]),Y(p[0][1]));
+      for(let i=0;i<p.length-1;i++){
+        const p0=p[i>0?i-1:i], p1=p[i], p2=p[i+1], p3=p[i+2]||p[i+1];
+        const c1x=X(p1[0])+(X(p2[0])-X(p0[0]))/6, c1y=Y(p1[1])+(Y(p2[1])-Y(p0[1]))/6;
+        const c2x=X(p2[0])-(X(p3[0])-X(p1[0]))/6, c2y=Y(p2[1])-(Y(p3[1])-Y(p1[1]))/6;
+        ctx.bezierCurveTo(c1x,c1y,c2x,c2y,X(p2[0]),Y(p2[1]));
+      }
+    }
+    // 塗り
+    smooth(pts);
+    ctx.lineTo(X(2026),Y(0)); ctx.lineTo(X(1950),Y(0)); ctx.closePath();
+    const grad=ctx.createLinearGradient(0,padT,0,padT+plotH);
+    grad.addColorStop(0,'rgba(31,138,138,.28)'); grad.addColorStop(1,'rgba(31,138,138,.02)');
+    ctx.fillStyle=grad; ctx.fill();
+    // 線
+    smooth(pts);
+    ctx.strokeStyle='#1f8a8a'; ctx.lineWidth=3; ctx.lineJoin='round'; ctx.stroke();
+  }
+
+  // ===== グラフ2：1億人到達までの月数 =====
+  function drawBar(){
+    const canvas=document.getElementById('barChart');
+    const { ctx, w, h }=setupCanvas(canvas);
+    const data=[
+      ['ChatGPT',2,'#e0556b'],
+      ['TikTok',9,'#5a8def'],
+      ['Instagram',30,'#f3b95f'],
+      ['スマホアプリ\n各種SNS',54,'#7bc6c6'],
+      ['携帯電話',192,'#9aa8b2']
+    ];
+    const maxV=200;
+    const padL=110, padR=40, padT=10, padB=20;
+    const plotW=w-padL-padR, plotH=h-padT-padB;
+    const barH=plotH/data.length*0.6, gap=plotH/data.length;
+    ctx.textBaseline='middle';
+    data.forEach((d,i)=>{
+      const y=padT+gap*i+gap/2;
+      const bw=Math.max((d[1]/maxV)*plotW, 4);
+      // ラベル
+      ctx.fillStyle='#3a4750'; ctx.font='12px "Noto Sans JP"'; ctx.textAlign='right';
+      const lines=d[0].split('\n');
+      lines.forEach((ln,li)=> ctx.fillText(ln, padL-12, y-(lines.length-1)*7+li*14));
+      // バー
+      const r=6;
+      ctx.fillStyle=d[2];
+      ctx.beginPath();
+      ctx.moveTo(padL,y-barH/2);
+      ctx.lineTo(padL+bw-r,y-barH/2);
+      ctx.arcTo(padL+bw,y-barH/2,padL+bw,y-barH/2+r,r);
+      ctx.lineTo(padL+bw,y+barH/2-r);
+      ctx.arcTo(padL+bw,y+barH/2,padL+bw-r,y+barH/2,r);
+      ctx.lineTo(padL,y+barH/2);
+      ctx.closePath(); ctx.fill();
+      // 数値
+      ctx.fillStyle='#3a4750'; ctx.font='bold 12px "Poppins",sans-serif'; ctx.textAlign='left';
+      const label = d[1]<12 ? d[1]+'か月' : (d[1]/12).toFixed(d[1]%12?1:0)+'年（'+d[1]+'か月）';
+      ctx.fillText(label, padL+bw+8, y);
+    });
+  }
+
+  function renderAll(){ drawWave(); drawBar(); }
+  window.addEventListener('load', renderAll);
+  let rt; window.addEventListener('resize',()=>{ clearTimeout(rt); rt=setTimeout(renderAll,200); });
+  </script>
+</body>
+</html>
