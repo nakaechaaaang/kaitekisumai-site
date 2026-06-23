@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>初心者でもわかる Codex の使い方｜快適住まいの案内人（快住）</title>
+  <meta name="description" content="ChatGPTのCodex（クラウド版）を、はじめての方でも使えるようにやさしく解説。Codexでできること・始め方・指示のコツ・注意点をステップごとにご紹介します。">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="site-header" id="top">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <img src="images/common/icon-logo-header.webp" alt="快住 - 快適住まいの案内人" class="logo-img">
+      </a>
+      <nav class="global-nav" id="globalNav">
+        <ul class="nav-list">
+          <li><a href="index.html"><span class="nav-en">TOP</span><span class="nav-jp">トップ</span></a></li>
+          <li><a href="index.html#service"><span class="nav-en">SERVICE</span><span class="nav-jp">サービス内容</span></a></li>
+          <li><a href="index.html#news"><span class="nav-en">NEWS</span><span class="nav-jp">新着情報</span></a></li>
+          <li><a href="index.html#faq"><span class="nav-en">FAQ</span><span class="nav-jp">よくあるご質問</span></a></li>
+          <li><a href="company.html"><span class="nav-en">COMPANY</span><span class="nav-jp">運営会社</span></a></li>
+        </ul>
+      </nav>
+      <a href="index.html#contact" class="header-contact-btn">
+        <span class="btn-en">CONTACT</span>
+        <span class="btn-jp">お問い合わせ</span>
+      </a>
+      <button class="hamburger" id="hamburger" aria-label="メニューを開く">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <section class="page-hero">
+    <div class="page-hero-inner">
+      <h1 class="page-hero-title">
+        <span class="page-hero-en">CODEX GUIDE</span>
+        <span class="page-hero-jp">初心者でもわかる Codex の使い方</span>
+      </h1>
+    </div>
+  </section>
+
+  <main>
+    <!-- ===== INTRO / Codexとは ===== -->
+    <section class="guide-section guide-section--beige">
+      <div class="container guide-narrow">
+        <h2 class="guide-title">Codex（コーデックス）とは？</h2>
+        <p class="guide-subtitle">むずかしい知識がなくても、文章でお願いするだけ。</p>
+        <div class="guide-callout">
+          <p><strong>Codex（クラウド版）</strong>は、ChatGPT の中で使える「AI のプログラミング担当者」です。あなたが日本語で「○○を直して」「△△を作って」とお願いすると、Codex がクラウド（インターネット上）の作業部屋でコードを書いたり直したりしてくれます。</p>
+          <p>自分のパソコンに特別なソフトを入れる必要はありません。ChatGPT の画面からお願いするだけで、Codex が裏側で作業し、その結果を見せてくれます。料理でいえば「材料と要望を伝えると、調理して仕上がりを出してくれるキッチン」のようなイメージです。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== できること ===== -->
+    <section class="guide-section">
+      <div class="container">
+        <h2 class="guide-title">Codex でできること</h2>
+        <p class="guide-subtitle">こんな作業を、お願いベースで任せられます。</p>
+        <div class="guide-cards">
+          <div class="guide-card">
+            <div class="guide-card-icon">✏️</div>
+            <h3 class="guide-card-title">新しい機能をつくる</h3>
+            <p class="guide-card-desc">「お問い合わせフォームを追加して」のように頼むと、必要なコードをまとめて書いてくれます。</p>
+          </div>
+          <div class="guide-card">
+            <div class="guide-card-icon">🐞</div>
+            <h3 class="guide-card-title">バグ（不具合）を直す</h3>
+            <p class="guide-card-desc">「ボタンが押せない不具合を直して」と伝えれば、原因を探して修正案を出してくれます。</p>
+          </div>
+          <div class="guide-card">
+            <div class="guide-card-icon">❓</div>
+            <h3 class="guide-card-title">コードの中身を質問する</h3>
+            <p class="guide-card-desc">「このプログラムは何をしている？」と聞けば、内容をわかりやすく説明してくれます。</p>
+          </div>
+          <div class="guide-card">
+            <div class="guide-card-icon">🧪</div>
+            <h3 class="guide-card-title">動作チェックや整理</h3>
+            <p class="guide-card-desc">テストの実行やコードの整理（読みやすく書き直す作業）も任せられます。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 始め方ステップ ===== -->
+    <section class="guide-section guide-section--green">
+      <div class="container">
+        <h2 class="guide-title">はじめての使い方（4ステップ）</h2>
+        <p class="guide-subtitle">画面の流れにそって進めれば大丈夫です。</p>
+        <div class="step-list">
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <h3 class="step-body-title">ChatGPT で Codex を開く</h3>
+              <p class="step-body-desc">ChatGPT にログインし、画面の横にあるメニューから <code>Codex</code> を選びます。Codex は対応プランで利用できる機能です（プランによって使える範囲が異なります）。</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <h3 class="step-body-title">GitHub とつないで、作業するリポジトリを選ぶ</h3>
+              <p class="step-body-desc">Codex は「リポジトリ」（プログラムの保管場所）の中で作業します。初回は GitHub アカウントを連携し、作業したいリポジトリを選びましょう。一度つなげば次回からは選ぶだけです。</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <h3 class="step-body-title">やってほしいことを日本語で書く</h3>
+              <p class="step-body-desc">入力欄に「○○ページを追加して」など、お願いを文章で書きます。変更を頼むときは <code>Code</code>、質問だけのときは <code>Ask</code> を選ぶと、目的に合った動きをしてくれます。</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <h3 class="step-body-title">結果を確認して取り込む</h3>
+              <p class="step-body-desc">Codex が作業を終えると、変更した箇所の一覧（差分）を見せてくれます。内容を確認し、問題なければ「プルリクエスト」という形で正式に反映します。気になる点は追加でお願いして直してもらえます。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 指示のコツ ===== -->
+    <section class="guide-section">
+      <div class="container">
+        <h2 class="guide-title">上手にお願いするコツ</h2>
+        <p class="guide-subtitle">伝え方を少し工夫すると、ねらい通りの結果になりやすくなります。</p>
+        <div class="tip-list">
+          <div class="tip-row">
+            <span class="tip-check">✓</span>
+            <p class="tip-text"><strong>具体的に伝える</strong>：「よくして」より「文字を大きく、色を緑にして」のように、どうしてほしいかを書きましょう。</p>
+          </div>
+          <div class="tip-row">
+            <span class="tip-check">✓</span>
+            <p class="tip-text"><strong>場所を教える</strong>：「トップページの問い合わせボタン」など、対象のファイルや画面を示すと迷いません。</p>
+          </div>
+          <div class="tip-row">
+            <span class="tip-check">✓</span>
+            <p class="tip-text"><strong>一度に欲張らない</strong>：大きなお願いは小さく分けると、確認しやすく失敗も減ります。</p>
+          </div>
+          <div class="tip-row">
+            <span class="tip-check">✓</span>
+            <p class="tip-text"><strong>仕上がりの条件を添える</strong>：「スマホでも崩れないように」など、満たしてほしい条件を書くと安心です。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 注意点 ===== -->
+    <section class="guide-section guide-section--beige">
+      <div class="container">
+        <h2 class="guide-title">使うときの注意点</h2>
+        <p class="guide-subtitle">便利ですが、最後は人の目で確認することが大切です。</p>
+        <div class="note-box">
+          <p class="note-box-title">ここをチェック！</p>
+          <ul>
+            <li>結果は必ず内容を確認してから反映しましょう。間違いが含まれることもあります。</li>
+            <li>パスワードや個人情報など、見せたくない情報は入力しないようにしましょう。</li>
+            <li>大事なデータは、反映する前にバックアップ（控え）をとっておくと安心です。</li>
+            <li>わからない言葉が出てきたら、その場で Codex に「これは何？」と質問できます。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FAQ ===== -->
+    <section class="faq" id="faq">
+      <div class="container">
+        <h2 class="faq-section-title">
+          <span class="faq-en">FAQ</span>
+          <span class="faq-jp">Codex についてよくある質問</span>
+        </h2>
+        <div class="faq-list">
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              <span class="faq-q-icon">Q</span>
+              <span class="faq-q-text">プログラミングの知識がなくても使えますか？</span>
+              <span class="faq-toggle-icon"></span>
+            </button>
+            <div class="faq-answer">
+              <span class="faq-a-icon">A</span>
+              <p>はい、基本的な操作は日本語のお願いだけで進められます。ただし、出てきた結果が正しいかを判断する場面では、ある程度の確認や周りの方のサポートがあるとより安心です。</p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              <span class="faq-q-icon">Q</span>
+              <span class="faq-q-text">自分のパソコンに何かインストールが必要ですか？</span>
+              <span class="faq-toggle-icon"></span>
+            </button>
+            <div class="faq-answer">
+              <span class="faq-a-icon">A</span>
+              <p>クラウド版の Codex は、作業がインターネット上で行われるため、特別なソフトのインストールは不要です。ChatGPT にログインできるブラウザがあれば始められます。</p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              <span class="faq-q-icon">Q</span>
+              <span class="faq-q-text">日本語でお願いしても大丈夫ですか？</span>
+              <span class="faq-toggle-icon"></span>
+            </button>
+            <div class="faq-answer">
+              <span class="faq-a-icon">A</span>
+              <p>はい、日本語でお願いできます。なるべく具体的に「何を」「どうしてほしいか」を書くと、より意図どおりに動いてくれます。</p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              <span class="faq-q-icon">Q</span>
+              <span class="faq-q-text">間違った変更をされてしまったら？</span>
+              <span class="faq-toggle-icon"></span>
+            </button>
+            <div class="faq-answer">
+              <span class="faq-a-icon">A</span>
+              <p>Codex の変更は、確認してから反映する流れになっています。気に入らなければ反映しなければよく、追加で「ここを直して」とお願いして修正してもらうこともできます。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CTA ===== -->
+    <section class="guide-section guide-cta">
+      <div class="container guide-narrow">
+        <p class="guide-lead" style="text-align:center;">まずは小さなお願いから試してみましょう。<br>使ううちに、頼り方のコツがつかめてきます。</p>
+        <a href="index.html" class="btn-primary">トップページへ戻る</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <a href="index.html" class="footer-logo"><img src="images/common/icon-logo-footer.webp" alt="快住 - 快適住まいの案内人" class="footer-logo-img"></a>
+      <nav class="footer-nav"><ul><li><a href="index.html">TOP / トップ</a></li><li><a href="index.html#service">SERVICE / サービス内容</a></li><li><a href="index.html#news">NEWS / 新着情報</a></li><li><a href="index.html#faq">FAQ / よくあるご質問</a></li><li><a href="company.html">COMPANY / 運営会社</a></li></ul></nav>
+      <div class="footer-company"><img src="images/common/icon-inc.webp" alt="KEY PERSON Inc." class="footer-company-img"></div>
+      <div class="footer-social">
+        <a href="https://www.instagram.com/kaiju_k.itou" target="_blank" rel="noopener"><img src="images/common/icon-insta.webp" alt="Instagram"></a>
+        <a href="https://x.com/kaiju_kaisuma" target="_blank" rel="noopener"><img src="images/common/icon-x.webp" alt="X"></a>
+        <a href="https://www.youtube.com/@%E5%BF%AB%E9%81%A9%E4%BD%8F%E3%81%BE%E3%81%84%E3%81%AE%E6%A1%88%E5%86%85%E4%BA%BA" target="_blank" rel="noopener"><img src="images/common/icon-youtube.webp" alt="YouTube"></a>
+        <a href="https://www.facebook.com/keigo.itoh.58" target="_blank" rel="noopener"><img src="images/common/icon-facebook.webp" alt="Facebook"></a>
+      </div>
+      <p class="footer-copy"><img src="images/common/icon-copy.webp" alt="Copyright © 2025 KEY PERSON Inc."></p>
+    </div>
+  </footer>
+
+  <div class="fixed-bottom-bar">
+    <a href="tel:090-6443-1357" class="fixed-btn fixed-btn--phone"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.15 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg><span>090-6443-1357</span></a>
+    <a href="index.html#contact" class="fixed-btn fixed-btn--contact"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg><span>お問い合わせ</span></a>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
