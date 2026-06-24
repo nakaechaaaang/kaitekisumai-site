@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>仕事が劇的に捗る｜Claudeの隠れた実力派ツール10選</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --clay:#d97757;          /* Anthropic clay */
+    --clay-dark:#be5d40;
+    --ink:#1f1b18;
+    --sub:#6b625c;
+    --paper:#f7f3ee;
+    --card:#ffffff;
+    --line:#e7ded4;
+    --accent:#2f6f6a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:"Noto Sans JP",sans-serif;
+    background:#11100f;
+    color:var(--ink);
+    overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  .deck{position:relative;width:100vw;height:100vh;}
+
+  .slide{
+    position:absolute;inset:0;
+    display:none;
+    flex-direction:column;
+    justify-content:center;
+    padding:6vh 8vw;
+    background:var(--paper);
+    background-image:radial-gradient(circle at 100% 0%,rgba(217,119,87,.10),transparent 45%),
+                     radial-gradient(circle at 0% 100%,rgba(47,111,106,.07),transparent 40%);
+    animation:fade .45s ease both;
+  }
+  .slide.active{display:flex;}
+  @keyframes fade{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+
+  /* progress + nav */
+  .topbar{position:fixed;top:0;left:0;right:0;height:5px;background:rgba(0,0,0,.06);z-index:30;}
+  .topbar i{display:block;height:100%;background:var(--clay);width:0;transition:width .35s ease;}
+  .pageno{position:fixed;bottom:22px;right:30px;z-index:30;font-family:"Poppins",sans-serif;
+    font-weight:700;color:var(--sub);font-size:.85rem;letter-spacing:.06em;}
+  .brandtag{position:fixed;bottom:22px;left:30px;z-index:30;font-size:.72rem;color:var(--sub);letter-spacing:.04em;}
+  .hint{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:30;font-size:.7rem;color:#b6a99d;}
+
+  /* TITLE */
+  .title-slide{align-items:flex-start;}
+  .eyebrow{font-family:"Poppins",sans-serif;font-weight:700;letter-spacing:.22em;
+    color:var(--clay);font-size:clamp(.8rem,1.4vw,1rem);text-transform:uppercase;margin-bottom:26px;}
+  .title-slide h1{font-size:clamp(2.2rem,5.4vw,4.4rem);font-weight:900;line-height:1.18;letter-spacing:.01em;}
+  .title-slide h1 .hl{color:var(--clay);}
+  .title-slide .lead{margin-top:30px;font-size:clamp(1rem,1.8vw,1.4rem);color:var(--sub);
+    line-height:1.9;max-width:42ch;font-weight:500;}
+  .source{margin-top:42px;font-size:.82rem;color:#9b8f83;border-left:3px solid var(--clay);padding-left:14px;line-height:1.7;}
+
+  /* SECTION-ish intro */
+  .center{align-items:center;text-align:center;justify-content:center;}
+  .center h2{font-size:clamp(1.6rem,3.4vw,2.8rem);font-weight:900;line-height:1.5;max-width:24ch;}
+  .center h2 .hl{color:var(--clay);}
+  .center p{margin-top:26px;color:var(--sub);font-size:clamp(1rem,1.7vw,1.3rem);line-height:1.9;max-width:40ch;}
+
+  /* CONTENT */
+  .num-badge{display:inline-flex;align-items:center;gap:14px;margin-bottom:22px;}
+  .num-badge .n{font-family:"Poppins",sans-serif;font-weight:800;font-size:clamp(2rem,4vw,3.2rem);
+    color:#fff;background:var(--clay);width:1.9em;height:1.9em;display:flex;align-items:center;justify-content:center;
+    border-radius:18px;box-shadow:0 10px 28px rgba(217,119,87,.35);}
+  .num-badge .cat{font-family:"Poppins",sans-serif;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--accent);font-size:clamp(.7rem,1.1vw,.85rem);}
+  .slide h2.headline{font-size:clamp(1.6rem,3.6vw,3rem);font-weight:900;line-height:1.3;margin-bottom:10px;max-width:26ch;}
+  .slide h2.headline .hl{color:var(--clay);}
+  .desc{font-size:clamp(1rem,1.7vw,1.3rem);color:var(--sub);line-height:1.95;max-width:48ch;margin-top:18px;font-weight:500;}
+  .points{margin-top:26px;display:flex;flex-direction:column;gap:14px;max-width:54ch;}
+  .points li{list-style:none;display:flex;gap:14px;align-items:flex-start;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 20px;
+    font-size:clamp(.92rem,1.5vw,1.12rem);line-height:1.6;box-shadow:0 4px 16px rgba(31,27,24,.04);}
+  .points li b{color:var(--ink);}
+  .points li .ic{color:var(--clay);font-weight:900;font-family:"Poppins",sans-serif;flex:none;}
+
+  /* closing list grid */
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 28px;margin-top:30px;max-width:60vw;}
+  .grid div{display:flex;gap:12px;align-items:baseline;font-size:clamp(.85rem,1.4vw,1.05rem);
+    padding:8px 0;border-bottom:1px dashed var(--line);}
+  .grid div span{font-family:"Poppins",sans-serif;font-weight:800;color:var(--clay);}
+
+  @media(max-width:760px){
+    .slide{padding:8vh 7vw;}
+    .grid{grid-template-columns:1fr;max-width:100%;}
+  }
+</style>
+</head>
+<body>
+<div class="topbar"><i id="bar"></i></div>
+<div class="deck" id="deck">
+
+  <!-- 0 TITLE -->
+  <section class="slide title-slide active">
+    <div class="eyebrow">Lifehacker × Claude</div>
+    <h1>仕事が劇的に捗る<br><span class="hl">Claudeの隠れた実力派</span><br>ツール 10選</h1>
+    <p class="lead">プロンプト入力欄の「外側」にこそ、本当に使える機能が眠っている。メール整理から資料作成、プライバシー保護まで——今日から使える10の活用法。</p>
+    <p class="source">出典：ライフハッカー・ジャパン「仕事が劇的に捗るClaudeの隠れた実力派ツール10選」</p>
+  </section>
+
+  <!-- 1 INTRO -->
+  <section class="slide center">
+    <h2>多くの人は<span class="hl">「チャット」</span>としてしか<br>Claudeを使っていない。</h2>
+    <p>でも本当の実力は、連携・スキル・ビジュアル生成・プライバシー設定など、<b>入力欄の外</b>に広がっています。10個の機能を順に見ていきましょう。</p>
+  </section>
+
+  <!-- T1 -->
+  <section class="slide">
+    <div class="num-badge"><span class="n">01</span><span class="cat">Connectors / Gmail</span></div>
+    <h2 class="headline">Gmailと連携して<br><span class="hl">受信トレイを自動整理</span></h2>
+    <p class="desc">コネクター機能で受信トレイへのアクセスを許可すると、メールの山をClaudeが代わりにさばいてくれます。</p>
+    <ul class="points">
+      <li><span class="ic">▸</span><span>溜まったメールを<b>要約</b>し、今日の論点を一覧化</span></li>
+      <li><span class="ic">▸</span><span><b>返信が必要なメール</b>だけを抽出して優先順位づけ</span></li>
+      <li><span class="ic">▸</span><span>「先週の請求書を探して」など<b>自然文で検索</b></span></li>
+    </ul>
+  </section>
+
+  <!-- T2 -->
+  <section class="slide">
+    <div class="num-badge"><span class="n">02</span><span class="cat">Artifacts</span></div>
+    <h2 class="headline">「動く図やグラフ」で<br><span class="hl">理解と学習を加速</span></h2>
+    <p class="desc">アーティファクト機能なら、説明を文章で読むだけでなく、その場で動かせるインタラクティブな図解を生成できます。</p>
+    <ul class="points">
+      <li><span class="ic">▸</span><span>複雑な概念を<b>操作できるビジュアル</b>に変換</span></li>
+      <li><span class="ic">▸</span><span>チャット横で<b>リアルタイムにプレビュー・実行</b></span></li>
+      <li><span class="ic">▸</span><span>学習・プレゼン資料づくりの強力な相棒に</span></li>
+    </ul>
+  </section>
+
+  <!-- T3 -->
+  <section class="slide">
+    <div class="num-badge"><span class="n">03</span><span class="cat">Prompting</span></div>
+    <h2 class="headline">プロンプトを工夫して<br><span class="hl">情報源を検証させる</span></h2>
+    <p class="desc">「裏取りして」「出典を示して」と一言加えるだけで、回答の信頼性が大きく変わります。</p>
+    <ul class="points">
+      <li><span class="ic">▸</span><span><b>根拠URL・出典の明示</b>を指示する</span></li>
+      <li><span class="ic">▸</span><span>「確信が持てない点は明記して」で<b>ハルシネーション対策</b></span></li>
+      <li><span class="ic">▸</span><span>重要な意思決定こそ<b>事実確認をルール化</b></span></li>
+    </ul>
+  </section>
+
+  <!-- T4 -->
+  <section class="slide">
+    <div class="num-badge"><span class="n">04</span><span class="cat">Styles</span></div>
+    <h2 class="headline">スタイルを指定して<br><span class="hl">回答のトーンを最適化</span></h2>
+    <p class="desc">毎回お願いしなくても、文体・粒度・フォーマットを「スタイル」として固定できます。</p>
+    <ul class="points">
+      <li><span class="ic">▸</span><span><b>簡潔／丁寧／フォーマル</b>など出力の性格を設定</span></li>
+      <li><span class="ic">▸</span><span>自分専用の<b>カスタムスタイル</b>を作成可能</span></li>
+      <li><span class="ic">▸</span><span>※スタイルは現在「スキル」へ統合が進行中</span></li>
+    </ul>
+  </section>
+
+  <!-- T5 -->
+  <section class="slide">
+    <div class="num-badge"><span class="n">05</span><span class="cat">Skills</span></div>
+    <h2 class="headline">スキルを使って<br><span class="hl">定型業務を丸ごと完了</span></h2>
+    <p class="desc">「こう頼まれたら、この手順で進めて」をルール化したのがスキル。対話しながら一緒に作れます。</p>
+    <ul class="points">
+      <li><span class="ic">▸</span><span>繰り返す作業を<b>手順込みで自動化</b></span></li>
+      <li><span class="ic">▸</span><span>ゼロから書かず<b>Claudeと会話して作成</b></span></li>
+      <li><span class="ic">▸</span><span>レポート作成・データ整形などに最適</span></li>
+    </ul>
+  </section>
+
+  <!-- T6 -->
+  <section class="slide">
+    <div class="num-badge"><span class="n">06</span><span class="cat">Privacy</span></div>
+    <h2 class="headline">会話を<br><span class="hl">学習データから除外</span></h2>
+    <p class="desc">設定からオプトアウトすれば、自分の会話をモデルのトレーニングに使われないようにできます。</p>
+    <ul class="points">
+      <li><span class="ic">▸</span><span>設定画面で<b>データ利用をオフ</b>に</span></li>
+      <li><span class="ic">▸</span><span>機密情報・社内データを扱う人に必須</span></li>
+      <li><span class="ic">▸</span><span>安心して業務利用するための第一歩</span></li>
+    </ul>
+  </section>
+
+  <!-- T7 -->
+  <section class="slide">
+    <div class="num-badge"><span class="n">07</span><span class="cat">Share</span></div>
+    <h2 class="headline">チャットリンクで<br><span class="hl">共同作業を生み出す</span></h2>
+    <p class="desc">会話をリンク化して共有すれば、チームでナレッジや検討プロセスをそのまま引き継げます。</p>
+    <ul class="points">
+      <li><span class="ic">▸</span><span>優れた<b>やり取りをそのまま共有</b></span></li>
+      <li><span class="ic">▸</span><span>続きから<b>チームで検討</b>を再開</span></li>
+      <li><span class="ic">▸</span><span>プロンプトの再利用・教育にも便利</span></li>
+    </ul>
+  </section>
+
+  <!-- T8 -->
+  <section class="slide">
+    <div class="num-badge"><span class="n">08</span><span class="cat">File Creation</span></div>
+    <h2 class="headline">Excelファイルを生成し<br><span class="hl">毎月の予算を管理</span></h2>
+    <p class="desc">数式入りのスプレッドシートまで作成。家計簿や予算表をその場で出力できます。</p>
+    <ul class="points">
+      <li><span class="ic">▸</span><span>項目・<b>計算式入りのExcel</b>を自動生成</span></li>
+      <li><span class="ic">▸</span><span>収支管理・経費精算テンプレに活用</span></li>
+      <li><span class="ic">▸</span><span>ダウンロードしてすぐ実務に投入</span></li>
+    </ul>
+  </section>
+
+  <!-- T9 -->
+  <section class="slide">
+    <div class="num-badge"><span class="n">09</span><span class="cat">Browser Extension</span></div>
+    <h2 class="headline">ブラウザ拡張で<br><span class="hl">最適なホテルを探す</span></h2>
+    <p class="desc">拡張機能を使えば、見ているWebページ上でClaudeを動かし、情報収集や比較を任せられます。</p>
+    <ul class="points">
+      <li><span class="ic">▸</span><span>閲覧中のページを<b>その場で分析・要約</b></span></li>
+      <li><span class="ic">▸</span><span>条件に合う<b>ホテルや候補を比較</b></span></li>
+      <li><span class="ic">▸</span><span>リサーチや旅行計画を大幅に時短</span></li>
+    </ul>
+  </section>
+
+  <!-- T10 -->
+  <section class="slide">
+    <div class="num-badge"><span class="n">10</span><span class="cat">Incognito</span></div>
+    <h2 class="headline">シークレットモードで<br><span class="hl">プライベートに会話</span></h2>
+    <p class="desc">履歴に残したくない相談は、シークレットモードで。記録を残さず気軽に試せます。</p>
+    <ul class="points">
+      <li><span class="ic">▸</span><span>会話を<b>履歴に保存しない</b></span></li>
+      <li><span class="ic">▸</span><span>一時的な検証・下書きに最適</span></li>
+      <li><span class="ic">▸</span><span>プライバシーを守りつつ自由に試行</span></li>
+    </ul>
+  </section>
+
+  <!-- CLOSING -->
+  <section class="slide">
+    <div class="eyebrow" style="margin-bottom:14px;">Summary</div>
+    <h2 class="headline">入力欄の外に、<span class="hl">本当の実力</span>がある。</h2>
+    <div class="grid">
+      <div><span>01</span>Gmail連携で受信トレイ整理</div>
+      <div><span>02</span>動く図・グラフで学習</div>
+      <div><span>03</span>情報源を検証させる</div>
+      <div><span>04</span>スタイルで回答を最適化</div>
+      <div><span>05</span>スキルで業務を自動化</div>
+      <div><span>06</span>会話を学習データから除外</div>
+      <div><span>07</span>チャットリンクで共同作業</div>
+      <div><span>08</span>Excel生成で予算管理</div>
+      <div><span>09</span>ブラウザ拡張でホテル探し</div>
+      <div><span>10</span>シークレットモードで会話</div>
+    </div>
+    <p class="desc" style="margin-top:30px;">まずは1つ、今日の業務で試してみましょう。</p>
+  </section>
+
+</div>
+
+<div class="pageno"><span id="cur">1</span> / <span id="tot">13</span></div>
+<div class="brandtag">Claude 活用ガイド ・ 出典: ライフハッカー・ジャパン</div>
+<div class="hint">← → / クリック / スペースキー で移動</div>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  const bar=document.getElementById('bar');
+  const cur=document.getElementById('cur');
+  document.getElementById('tot').textContent=slides.length;
+  let i=0;
+  function show(n){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+    bar.style.width=((i)/(slides.length-1)*100)+'%';
+    cur.textContent=i+1;
+  }
+  function next(){show(i+1);}
+  function prev(){show(i-1);}
+  document.addEventListener('keydown',e=>{
+    if(['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)){e.preventDefault();next();}
+    if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();prev();}
+    if(e.key==='Home')show(0);
+    if(e.key==='End')show(slides.length-1);
+  });
+  document.getElementById('deck').addEventListener('click',e=>{
+    if(e.clientX < window.innerWidth*0.25) prev(); else next();
+  });
+  show(0);
+</script>
+</body>
+</html>
