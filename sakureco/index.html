@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>サクレコ — 5分制限なしの画面録画・即共有</title>
+<meta name="description" content="アカウント不要・時間無制限・高画質。録画したらその場で共有リンク。ブラウザだけで動くLoom代替ツール。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%23E8432D'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F7F4EE; --paper2:#EFEAE0; --ink:#16181F; --ink2:#5C5A53;
+  --red:#E8432D; --red-deep:#C3301C; --line:#D9D3C6;
+  --ok:#1F7A4D;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px}
+body{
+  font-family:"Zen Kaku Gothic New",sans-serif; color:var(--ink);
+  background:var(--paper); min-height:100vh; position:relative;
+}
+body::before{
+  content:""; position:fixed; inset:0; pointer-events:none; opacity:.5; z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.wrap{max-width:880px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+header{display:flex;align-items:baseline;justify-content:space-between;padding:28px 0 0}
+.logo{font-family:"Shippori Mincho",serif;font-weight:700;font-size:1.5rem;letter-spacing:.08em}
+.logo .dot{color:var(--red);font-size:1.1em}
+.logo small{font-size:.65rem;letter-spacing:.3em;color:var(--ink2);margin-left:10px;font-family:"Zen Kaku Gothic New",sans-serif;font-weight:500}
+.hero{padding:56px 0 8px}
+.hero h1{
+  font-weight:900;font-size:clamp(1.9rem,5.4vw,3.1rem);line-height:1.35;letter-spacing:.02em;
+}
+.hero h1 em{font-style:normal;color:var(--red);
+  background:linear-gradient(transparent 72%, rgba(232,67,45,.18) 72%);}
+.hero p.lead{margin-top:18px;color:var(--ink2);font-size:1rem;line-height:1.9}
+.badges{display:flex;flex-wrap:wrap;gap:10px;margin:26px 0 0}
+.badge{
+  border:1.5px solid var(--ink);border-radius:999px;padding:6px 16px;font-size:.82rem;font-weight:700;
+  background:var(--paper);box-shadow:2.5px 2.5px 0 var(--ink);
+}
+.badge.red{background:var(--red);color:#fff;border-color:var(--red-deep);box-shadow:2.5px 2.5px 0 var(--red-deep)}
+
+.panel{
+  margin:48px 0 64px;border:2px solid var(--ink);border-radius:20px;background:#fff;
+  box-shadow:7px 7px 0 rgba(22,24,31,.9); overflow:hidden;
+}
+.panel-head{display:flex;align-items:center;gap:10px;border-bottom:2px solid var(--ink);padding:12px 20px;background:var(--paper2)}
+.panel-head .led{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.panel-head .led.on{background:var(--red);animation:pulse 1.2s infinite}
+.panel-head span{font-size:.8rem;letter-spacing:.18em;font-weight:700;color:var(--ink2)}
+.panel-body{padding:32px 28px 36px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* ---- setup ---- */
+.opt-group{margin-bottom:22px}
+.opt-label{font-size:.8rem;font-weight:700;letter-spacing:.14em;color:var(--ink2);margin-bottom:10px;display:block}
+.seg{display:flex;flex-wrap:wrap;gap:8px}
+.seg button{
+  font-family:inherit;font-size:.92rem;font-weight:700;padding:10px 18px;border-radius:12px;
+  border:1.5px solid var(--line);background:#fff;color:var(--ink2);cursor:pointer;transition:.15s;
+}
+.seg button:hover{border-color:var(--ink)}
+.seg button.sel{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.toggles{display:flex;flex-wrap:wrap;gap:18px}
+.campreview{display:none;margin:4px 0 22px;align-items:center;gap:16px}
+.campreview video{background:#000;object-fit:cover;transform:scaleX(-1);border:2px solid var(--ink);box-shadow:3px 3px 0 rgba(22,24,31,.25)}
+.campreview.circle video{width:150px;height:150px;border-radius:50%}
+.campreview.rect video{width:248px;height:140px;border-radius:12px}
+.campreview p{font-size:.78rem;color:var(--ink2);line-height:1.9}
+.campreview p b{color:var(--ink)}
+.campreview .err{color:var(--red-deep);font-weight:700}
+.tgl{display:flex;align-items:center;gap:8px;font-size:.92rem;font-weight:500;cursor:pointer;user-select:none}
+.tgl input{accent-color:var(--red);width:17px;height:17px;cursor:pointer}
+
+.reczone{display:flex;align-items:center;gap:26px;margin-top:34px;flex-wrap:wrap}
+#recBtn{
+  width:108px;height:108px;border-radius:50%;border:3px solid var(--ink);cursor:pointer;
+  background:radial-gradient(circle at 35% 30%, #FF6A52, var(--red) 60%);
+  box-shadow:0 0 0 7px #fff, 0 0 0 9px var(--ink), 5px 7px 18px rgba(195,48,28,.45);
+  display:grid;place-items:center;color:#fff;font-family:inherit;font-weight:900;font-size:1.05rem;
+  letter-spacing:.18em;transition:transform .15s; padding-left:.18em;
+}
+#recBtn:hover{transform:scale(1.05)}
+#recBtn:active{transform:scale(.97)}
+.rec-hint{font-size:.85rem;color:var(--ink2);line-height:1.9}
+.rec-hint b{color:var(--ink)}
+
+/* ---- recording ---- */
+.recording-ui{display:none;align-items:center;gap:22px;flex-wrap:wrap}
+#timer{font-variant-numeric:tabular-nums;font-weight:900;font-size:2.6rem;letter-spacing:.05em}
+.ctl{display:flex;gap:10px}
+.ctl button{
+  font-family:inherit;font-weight:700;font-size:.95rem;padding:13px 26px;border-radius:14px;cursor:pointer;
+  border:2px solid var(--ink);transition:.15s;
+}
+#stopBtn{background:var(--red);color:#fff;border-color:var(--red-deep);box-shadow:3px 3px 0 var(--red-deep)}
+#stopBtn:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--red-deep)}
+#pauseBtn{background:#fff;color:var(--ink);box-shadow:3px 3px 0 var(--ink)}
+#pauseBtn:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink)}
+.rec-live{display:flex;align-items:center;gap:9px;font-weight:700;color:var(--red);font-size:.9rem;letter-spacing:.1em}
+.rec-live::before{content:"";width:11px;height:11px;border-radius:50%;background:var(--red);animation:pulse 1.1s infinite}
+.monitor{display:none;flex-basis:100%;margin-top:8px}
+.monitor video{width:320px;max-width:100%;border:2px solid var(--ink);border-radius:10px;display:block;cursor:move;background:#000;touch-action:none}
+.monitor p{font-size:.75rem;color:var(--ink2);margin-top:7px;line-height:1.7}
+
+/* ---- lock screen ---- */
+#lockScreen{position:fixed;inset:0;background:var(--paper);z-index:100;display:grid;place-items:center;padding:24px}
+.lockcard{
+  width:min(440px,92vw);background:#fff;border:2px solid var(--ink);border-radius:20px;
+  box-shadow:7px 7px 0 rgba(22,24,31,.9);padding:38px 34px;text-align:center;
+}
+.lockcard .logo{justify-content:center;display:flex;margin-bottom:18px}
+.lockcard h2{font-size:1.1rem;font-weight:900;margin-bottom:8px}
+.lockcard p{font-size:.82rem;color:var(--ink2);line-height:1.8;margin-bottom:20px}
+.lockcard input{
+  width:100%;font-family:inherit;font-size:1.05rem;padding:13px 16px;border-radius:12px;
+  border:1.5px solid var(--line);background:var(--paper);outline:none;text-align:center;letter-spacing:.06em;
+}
+.lockcard input:focus{border-color:var(--ink)}
+.lockcard button{
+  width:100%;margin-top:14px;font-family:inherit;font-weight:700;font-size:1rem;padding:14px;
+  border-radius:12px;cursor:pointer;border:2px solid var(--red-deep);background:var(--red);color:#fff;
+  box-shadow:3px 3px 0 var(--red-deep);transition:.15s;
+}
+.lockcard button:hover{transform:translate(-1px,-1px)}
+.lockcard button:disabled{opacity:.5;transform:none;cursor:wait}
+.lockerr{display:none;margin-top:14px;color:var(--red-deep);font-weight:700;font-size:.85rem}
+
+/* ---- countdown ---- */
+#countOverlay{
+  position:fixed;inset:0;background:rgba(22,24,31,.88);display:none;place-items:center;z-index:50;
+}
+#countOverlay div{font-weight:900;font-size:9rem;color:var(--paper);font-variant-numeric:tabular-nums}
+
+/* ---- result ---- */
+.result{display:none}
+.result video{width:100%;border-radius:14px;border:2px solid var(--ink);background:#000;display:block}
+.meta-row{display:flex;gap:14px;margin-top:18px;flex-wrap:wrap;align-items:center}
+.meta-row input[type=text]{
+  flex:1;min-width:220px;font-family:inherit;font-size:1rem;padding:12px 16px;border-radius:12px;
+  border:1.5px solid var(--line);background:var(--paper);outline:none;
+}
+.meta-row input[type=text]:focus{border-color:var(--ink)}
+.dur{font-size:.9rem;color:var(--ink2);font-weight:700;white-space:nowrap}
+
+.trim{margin-top:24px;padding:18px 20px;border:1.5px dashed var(--line);border-radius:14px;background:var(--paper)}
+.trim h3{font-size:.85rem;letter-spacing:.14em;color:var(--ink2);margin-bottom:4px}
+.trim p{font-size:.78rem;color:var(--ink2);margin-bottom:14px}
+.trim-row{display:flex;align-items:center;gap:12px;margin:8px 0}
+.trim-row label{font-size:.85rem;font-weight:700;width:64px}
+.trim-row input[type=range]{flex:1;accent-color:var(--red)}
+.trim-row output{font-variant-numeric:tabular-nums;font-size:.88rem;width:64px;text-align:right;font-weight:700}
+
+.actions{display:flex;gap:14px;margin-top:26px;flex-wrap:wrap}
+.btn{
+  font-family:inherit;font-weight:700;font-size:1rem;padding:15px 28px;border-radius:14px;cursor:pointer;
+  border:2px solid var(--ink);transition:.15s;text-decoration:none;display:inline-flex;align-items:center;gap:9px;
+}
+.btn.primary{background:var(--red);color:#fff;border-color:var(--red-deep);box-shadow:3px 3px 0 var(--red-deep)}
+.btn.ghost{background:#fff;color:var(--ink);box-shadow:3px 3px 0 var(--ink)}
+.btn:hover{transform:translate(-1px,-1px)}
+.btn.primary:hover{box-shadow:4px 4px 0 var(--red-deep)}
+.btn.ghost:hover{box-shadow:4px 4px 0 var(--ink)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+
+.progress{display:none;margin-top:22px}
+.progress .bar{height:12px;border:1.5px solid var(--ink);border-radius:999px;overflow:hidden;background:#fff}
+.progress .fill{height:100%;width:0%;background:repeating-linear-gradient(45deg,var(--red),var(--red) 8px,#FF6A52 8px,#FF6A52 16px);transition:width .2s}
+.progress p{font-size:.82rem;color:var(--ink2);margin-top:8px;font-weight:700}
+
+.share{display:none;margin-top:24px;padding:20px 22px;border:2px solid var(--ok);border-radius:14px;background:#F0F7F2}
+.share h3{font-size:.95rem;color:var(--ok);margin-bottom:12px}
+.share-row{display:flex;gap:10px;flex-wrap:wrap}
+.share-row input{
+  flex:1;min-width:240px;font-family:inherit;font-size:.9rem;padding:11px 14px;border-radius:10px;
+  border:1.5px solid var(--ok);background:#fff;color:var(--ink);
+}
+.share-row .btn{padding:11px 20px;font-size:.9rem}
+.share small{display:block;margin-top:10px;color:var(--ink2);font-size:.75rem;line-height:1.7}
+
+.errbox{display:none;margin-top:20px;padding:14px 18px;border:2px solid var(--red);border-radius:12px;background:#FBEEEC;color:var(--red-deep);font-size:.9rem;font-weight:700}
+
+/* ---- why ---- */
+.why{padding:8px 0 70px}
+.why h2{font-family:"Shippori Mincho",serif;font-size:1.4rem;margin-bottom:26px;letter-spacing:.06em}
+.why h2 span{color:var(--red)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.card{border:1.5px solid var(--line);border-radius:16px;padding:22px;background:#fff}
+.card b{display:block;font-size:1rem;margin-bottom:8px}
+.card b i{font-style:normal;color:var(--red);margin-right:6px}
+.card p{font-size:.85rem;color:var(--ink2);line-height:1.9}
+footer{border-top:1.5px solid var(--line);padding:26px 0 40px;font-size:.78rem;color:var(--ink2);line-height:2}
+@media (max-width:560px){ #timer{font-size:2rem} .panel-body{padding:24px 18px 28px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo"><span class="dot">●</span> サクレコ<small>SAKU-RECO</small></div>
+  </header>
+
+  <section class="hero">
+    <h1>録ったら、<em>3秒で共有リンク。</em><br>5分制限も、アカウントも、なし。</h1>
+    <p class="lead">画面とカメラをブラウザだけで録画して、その場でURLを発行。インストール不要・無料・時間無制限。送られた相手もアプリなしでそのまま再生できます。</p>
+    <div class="badges">
+      <span class="badge red">時間無制限</span>
+      <span class="badge">登録不要</span>
+      <span class="badge">高画質そのまま</span>
+      <span class="badge">無劣化トリム</span>
+      <span class="badge">倍速視聴対応</span>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><span class="led" id="led"></span><span>RECORDER</span></div>
+    <div class="panel-body">
+
+      <div id="setupUI">
+        <div class="opt-group">
+          <span class="opt-label">録画モード</span>
+          <div class="seg" id="modeSeg">
+            <button data-mode="screen" class="sel">画面のみ</button>
+            <button data-mode="both">画面 ＋ カメラ（丸ワイプ）</button>
+            <button data-mode="cam">カメラのみ</button>
+          </div>
+        </div>
+        <div class="campreview" id="camPrevWrap">
+          <video id="camPrev" muted playsinline></video>
+          <p><b>カメラの映り確認用プレビュー</b>（鏡像表示）。<br>丸ワイプ選択時は、この丸い範囲がそのまま画面の左下に合成されます。<br><span class="err" id="camPrevMsg"></span></p>
+        </div>
+        <div class="opt-group">
+          <span class="opt-label">音声</span>
+          <div class="toggles">
+            <label class="tgl"><input type="checkbox" id="micChk" checked>マイク（自分の声）</label>
+            <label class="tgl" id="sysAudioWrap"><input type="checkbox" id="sysChk">画面の音（タブ／システム音声）</label>
+          </div>
+        </div>
+        <div class="opt-group">
+          <span class="opt-label">画質</span>
+          <div class="seg" id="qualSeg">
+            <button data-q="std" class="sel">標準 — 2時間級の長尺もOK</button>
+            <button data-q="high">高画質 — 30分以内の短尺向け</button>
+          </div>
+        </div>
+        <div class="reczone">
+          <button id="recBtn">REC</button>
+          <div class="rec-hint">
+            <b>押したら3秒カウントダウン後に録画開始。</b><br>
+            録画はあなたのPC内で処理されます。共有リンクを発行した時だけアップロードされます。<br>
+            推奨ブラウザ：Chrome / Edge（Macの「画面の音」はChromeのタブ共有時のみ）
+          </div>
+        </div>
+      </div>
+
+      <div class="recording-ui" id="recUI">
+        <span class="rec-live">REC</span>
+        <span id="timer">00:00</span>
+        <div class="ctl">
+          <button id="pauseBtn">一時停止</button>
+          <button id="stopBtn">■ 停止して確認</button>
+        </div>
+        <div class="monitor" id="monitorWrap">
+          <video id="monitorVid" muted playsinline autoplay></video>
+          <p>プレビューをクリック／ドラッグするとワイプが移動します。録画中は別の小窓（常に最前面）でも同じ操作ができます。</p>
+        </div>
+      </div>
+
+      <div class="result" id="resultUI">
+        <video id="preview" controls playsinline></video>
+        <div class="meta-row">
+          <input type="text" id="titleInput" placeholder="タイトル（例：◯◯様 操作説明 6/13）" maxlength="80">
+          <span class="dur" id="durLabel"></span>
+        </div>
+
+        <div class="trim">
+          <h3>無劣化トリム（前後カット）</h3>
+          <p>再エンコードせず、共有リンク側で再生範囲だけを指定します。画質劣化ゼロ・処理待ちゼロ。</p>
+          <div class="trim-row">
+            <label>開始</label><input type="range" id="trimStart" min="0" max="100" step="0.1" value="0"><output id="trimStartOut">0:00</output>
+          </div>
+          <div class="trim-row">
+            <label>終了</label><input type="range" id="trimEnd" min="0" max="100" step="0.1" value="100"><output id="trimEndOut">0:00</output>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" id="uploadBtn">共有リンクを発行</button>
+          <button class="btn ghost" id="downloadBtn">PCに保存</button>
+          <button class="btn ghost" id="retryBtn">撮り直す</button>
+        </div>
+
+        <div class="progress" id="progress">
+          <div class="bar"><div class="fill" id="progFill"></div></div>
+          <p id="progLabel">アップロード中… 0%</p>
+        </div>
+
+        <div class="share" id="shareBox">
+          <h3>✓ 共有リンクができました（コピー済み）</h3>
+          <div class="share-row">
+            <input type="text" id="shareUrl" readonly>
+            <button class="btn ghost" id="copyBtn">コピー</button>
+            <a class="btn ghost" id="openBtn" target="_blank">開く</a>
+          </div>
+          <small>リンクを知っている人は誰でも視聴できます（推測不能なURLで保護）。動画はクラウドストレージ（Cloudflare R2）に保存され、削除するまで視聴可能です。社外秘・個人情報を含む動画は「PCに保存」でのローカル共有をおすすめします。</small>
+        </div>
+
+        <div class="errbox" id="errBox2"></div>
+      </div>
+
+      <div class="errbox" id="errBox"></div>
+    </div>
+  </section>
+
+  <section class="why">
+    <h2>Loomで不満だったところを、<span>ぜんぶ外しました。</span></h2>
+    <div class="grid">
+      <div class="card"><b><i>01</i>5分の壁がない</b><p>無料プランの「1本5分・25本まで」制限なし。2時間超の長尺会議やセミナーも1本で録れます。</p></div>
+      <div class="card"><b><i>02</i>画質を落とさない</b><p>720pに圧縮されません。画面の解像度のまま最大1080p+で記録します。</p></div>
+      <div class="card"><b><i>03</i>処理待ちゼロ</b><p>「アップロード処理中…」で待たされません。停止した瞬間にプレビュー、リンク発行は数秒。</p></div>
+      <div class="card"><b><i>04</i>音ズレしにくい</b><p>映像と音声を1本のストリームに合成してから記録する方式で、再生時のズレを防ぎます。</p></div>
+      <div class="card"><b><i>05</i>トリムが無料</b><p>言い間違えた冒頭・最後の数秒は、無劣化トリムでカットして共有できます。</p></div>
+      <div class="card"><b><i>06</i>ログイン不要で再生</b><p>受け取った人はリンクを開くだけ。倍速視聴（〜2倍）にも対応しています。</p></div>
+    </div>
+  </section>
+
+  <footer>
+    サクレコ — earth and human film ／ 録画データはリンク発行時のみクラウドストレージ（Cloudflare R2）にアップロードされます。<br>
+    録画にはChrome / Edge推奨。視聴はスマホ含むほぼ全ブラウザに対応（録画形式により一部例外あり）。
+  </footer>
+</div>
+
+<div id="lockScreen">
+  <div class="lockcard">
+    <div class="logo"><span class="dot">●</span> サクレコ</div>
+    <h2>合言葉を入力してください</h2>
+    <p>サクレコは関係者専用の録画ツールです。<br>共有された動画リンクの視聴に合言葉は不要です。</p>
+    <input type="password" id="lockInput" placeholder="合言葉" autocomplete="current-password">
+    <button id="lockBtn">入室する</button>
+    <p class="lockerr" id="lockErr"></p>
+  </div>
+</div>
+
+<div id="countOverlay"><div id="countNum">3</div></div>
+
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+let mode = 'screen';
+let qual = 'std';
+let recorder = null, chunks = [], streams = [], audioCtx = null, rafId = null;
+let blob = null, blobUrl = null, ext = 'webm', mime = '';
+let timerInt = null, elapsed = 0, paused = false;
+let duration = 0;
+
+/* ---- mode segment ---- */
+$('modeSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  mode = b.dataset.mode;
+  [...$('modeSeg').children].forEach(x => x.classList.toggle('sel', x === b));
+  $('sysAudioWrap').style.display = mode === 'cam' ? 'none' : '';
+  updateCamPreview();
+});
+
+/* ---- ワイプ位置（正規化0..1の中心座標）とフローティングモニター ---- */
+let bubblePos = null;
+let pipWin = null;
+let monitorStream = null;
+
+function attachWipeDrag(el) {
+  let dragging = false;
+  const move = ev => {
+    const r = el.getBoundingClientRect();
+    bubblePos = {
+      x: Math.min(Math.max((ev.clientX - r.left) / r.width, 0), 1),
+      y: Math.min(Math.max((ev.clientY - r.top) / r.height, 0), 1),
+    };
+  };
+  el.addEventListener('pointerdown', ev => { dragging = true; el.setPointerCapture(ev.pointerId); move(ev); ev.preventDefault(); });
+  el.addEventListener('pointermove', ev => { if (dragging) move(ev); });
+  el.addEventListener('pointerup', () => { dragging = false; });
+  el.addEventListener('pointercancel', () => { dragging = false; });
+}
+
+/* 常に最前面の小窓（Document Picture-in-Picture）。録画開始クリックの中で開く必要がある */
+async function openWipePip() {
+  if (!('documentPictureInPicture' in window)) return;
+  try {
+    pipWin = await documentPictureInPicture.requestWindow({ width: 380, height: 252 });
+    pipWin.document.body.style.cssText = 'margin:0;background:#16181F;color:#9A97A0;font-family:sans-serif';
+    const ph = pipWin.document.createElement('div');
+    ph.textContent = '録画の準備中…';
+    ph.style.cssText = 'font-size:12px;padding:14px';
+    pipWin.document.body.appendChild(ph);
+    pipWin.addEventListener('pagehide', () => { pipWin = null; });
+    if (monitorStream) populatePip();
+  } catch (_) { pipWin = null; }
+}
+
+function populatePip() {
+  if (!pipWin || pipWin.closed) return;
+  const doc = pipWin.document;
+  doc.body.innerHTML = '';
+  const v = doc.createElement('video');
+  v.muted = true; v.autoplay = true; v.playsInline = true;
+  v.srcObject = monitorStream;
+  v.style.cssText = 'width:100%;display:block;cursor:move;touch-action:none';
+  doc.body.appendChild(v);
+  const hint = doc.createElement('div');
+  hint.textContent = 'クリック／ドラッグでワイプ移動（この小窓は録画に映りません）';
+  hint.style.cssText = 'font-size:11px;padding:6px 10px';
+  doc.body.appendChild(hint);
+  attachWipeDrag(v);
+}
+
+function setupWipeMonitor(videoTrack) {
+  monitorStream = new MediaStream([videoTrack]);
+  const mv = $('monitorVid');
+  mv.srcObject = monitorStream;
+  mv.play().catch(() => {});
+  $('monitorWrap').style.display = 'block';
+  if (!mv.dataset.draggable) { attachWipeDrag(mv); mv.dataset.draggable = '1'; }
+  if (pipWin) populatePip();
+}
+
+function closeWipeMonitor() {
+  if (pipWin && !pipWin.closed) pipWin.close();
+  pipWin = null;
+  monitorStream = null;
+  $('monitorVid').srcObject = null;
+  $('monitorWrap').style.display = 'none';
+}
+
+/* カメラモード選択時の映り確認プレビュー */
+let previewStream = null;
+async function updateCamPreview() {
+  const wrap = $('camPrevWrap');
+  if (mode === 'screen') { stopCamPreview(); return; }
+  wrap.classList.toggle('circle', mode === 'both');
+  wrap.classList.toggle('rect', mode === 'cam');
+  wrap.style.display = 'flex';
+  $('camPrevMsg').textContent = '';
+  if (!previewStream) {
+    try {
+      previewStream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 1280 }, height: { ideal: 720 } },
+      });
+      const v = $('camPrev');
+      v.srcObject = previewStream;
+      v.play().catch(() => {});
+    } catch (err) {
+      $('camPrevMsg').textContent = 'カメラを取得できませんでした：' + err.message;
+    }
+  }
+}
+function stopCamPreview() {
+  if (previewStream) { previewStream.getTracks().forEach(t => t.stop()); previewStream = null; }
+  $('camPrevWrap').style.display = 'none';
+}
+$('qualSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  qual = b.dataset.q;
+  [...$('qualSeg').children].forEach(x => x.classList.toggle('sel', x === b));
+});
+
+/* 録画中のタブ閉じ・リロード誤操作ガード */
+window.addEventListener('beforeunload', e => {
+  if (recorder && recorder.state !== 'inactive') { e.preventDefault(); e.returnValue = ''; }
+});
+
+/* ---- helpers ---- */
+const fmt = s => {
+  s = Math.max(0, Math.round(s));
+  const m = Math.floor(s / 60), ss = String(s % 60).padStart(2, '0');
+  return `${m}:${ss}`;
+};
+const showErr = (box, msg) => { box.textContent = msg; box.style.display = 'block'; };
+
+function pickMime() {
+  const cands = [
+    ['video/mp4;codecs="avc1.640028,mp4a.40.2"', 'mp4'],
+    ['video/mp4', 'mp4'],
+    ['video/webm;codecs=vp9,opus', 'webm'],
+    ['video/webm;codecs=vp8,opus', 'webm'],
+    ['video/webm', 'webm'],
+  ];
+  for (const [m, e] of cands) {
+    if (window.MediaRecorder && MediaRecorder.isTypeSupported(m)) return [m, e];
+  }
+  return [null, null];
+}
+
+function makeVideoEl(stream) {
+  const v = document.createElement('video');
+  v.muted = true; v.playsInline = true; v.srcObject = stream;
+  return v.play().then(() => v);
+}
+
+/* 描画loopの駆動。rAF/setTimeoutはタブ非表示時に間引かれて映像が止まり音ズレするため、
+   非表示でも間引かれないWorkerのタイマーで駆動する（Workerが作れない環境のみ従来方式）。 */
+function startTicker(fps, cb) {
+  const iv = Math.round(1000 / fps);
+  try {
+    const src = 'let t=null;onmessage=e=>{if(e.data==="stop"){clearInterval(t);close()}else t=setInterval(()=>postMessage(0),e.data)}';
+    const url = URL.createObjectURL(new Blob([src], { type: 'text/javascript' }));
+    const w = new Worker(url);
+    URL.revokeObjectURL(url);
+    w.onmessage = cb;
+    w.postMessage(iv);
+    return () => { try { w.postMessage('stop'); } catch (_) {} w.terminate(); };
+  } catch (_) {
+    let stopped = false, timer = null;
+    const loop = () => {
+      if (stopped) return;
+      cb();
+      if (!document.hidden) requestAnimationFrame(loop);
+      else timer = setTimeout(loop, iv);
+    };
+    loop();
+    return () => { stopped = true; clearTimeout(timer); };
+  }
+}
+
+/* ---- start ---- */
+$('recBtn').addEventListener('click', async () => {
+  $('errBox').style.display = 'none';
+  const [m, e] = pickMime();
+  if (!m) return showErr($('errBox'), 'このブラウザは録画に対応していません。Chrome / Edgeをお使いください。');
+  mime = m; ext = e;
+
+  // 画面+カメラ時はワイプ操作用の最前面小窓を開く（ユーザークリック直下でないと開けない）
+  if (mode === 'both') openWipePip();
+
+  let screenStream = null, camStream = null, micStream = null;
+  try {
+    if (mode !== 'cam') {
+      screenStream = await navigator.mediaDevices.getDisplayMedia({
+        video: { frameRate: { ideal: 30 } },
+        audio: $('sysChk').checked,
+      });
+    }
+    if (mode !== 'screen') {
+      if (previewStream && previewStream.active) {
+        camStream = previewStream;
+        previewStream = null;
+      } else {
+        camStream = await navigator.mediaDevices.getUserMedia({
+          video: { width: { ideal: 1280 }, height: { ideal: 720 } },
+        });
+      }
+    }
+    if ($('micChk').checked) {
+      micStream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: true },
+      });
+    }
+  } catch (err) {
+    [screenStream, camStream, micStream].forEach(s => s && s.getTracks().forEach(t => t.stop()));
+    closeWipeMonitor();
+    updateCamPreview();
+    if (err.name === 'NotAllowedError') return; // ユーザーがキャンセル
+    return showErr($('errBox'), '画面・カメラ・マイクの取得に失敗しました：' + err.message);
+  }
+
+  streams = [screenStream, camStream, micStream].filter(Boolean);
+
+  // --- 映像トラックを決定 ---
+  let videoTrack, cleanupDraw = null;
+  try {
+    if (mode === 'both') {
+      const sv = await makeVideoEl(screenStream);
+      const cv = await makeVideoEl(camStream);
+      const st = screenStream.getVideoTracks()[0].getSettings();
+      const canvas = document.createElement('canvas');
+      canvas.width = st.width || 1920; canvas.height = st.height || 1080;
+      const ctx = canvas.getContext('2d');
+      bubblePos = null; // 毎回左下スタート
+      const draw = () => {
+        ctx.drawImage(sv, 0, 0, canvas.width, canvas.height);
+        const d = Math.round(canvas.height * 0.24);
+        const r = d / 2;
+        const margin = Math.round(canvas.height * 0.035);
+        if (!bubblePos) bubblePos = { x: (margin + r) / canvas.width, y: (canvas.height - margin - r) / canvas.height };
+        const cx = Math.min(Math.max(bubblePos.x * canvas.width, r + 6), canvas.width - r - 6);
+        const cy = Math.min(Math.max(bubblePos.y * canvas.height, r + 6), canvas.height - r - 6);
+        ctx.save();
+        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.clip();
+        const vw = cv.videoWidth || 1280, vh = cv.videoHeight || 720;
+        const sc = Math.max(d / vw, d / vh);
+        ctx.drawImage(cv, cx - vw * sc / 2, cy - vh * sc / 2, vw * sc, vh * sc);
+        ctx.restore();
+        ctx.beginPath(); ctx.arc(cx, cy, r + 2, 0, Math.PI * 2);
+        ctx.lineWidth = 5; ctx.strokeStyle = '#fff'; ctx.stroke();
+      };
+      const stopTicker = startTicker(30, draw);
+      videoTrack = canvas.captureStream(30).getVideoTracks()[0];
+      cleanupDraw = () => { stopTicker(); closeWipeMonitor(); };
+      setupWipeMonitor(videoTrack);
+    } else if (mode === 'screen') {
+      // 画面共有の映像は「変化した時だけ」フレームが来る可変フレームレートで、
+      // そのまま記録すると等速の音声とずれる。Canvasで一定30fpsに変換してから記録する。
+      const sv = await makeVideoEl(screenStream);
+      const st = screenStream.getVideoTracks()[0].getSettings();
+      const canvas = document.createElement('canvas');
+      canvas.width = st.width || 1920; canvas.height = st.height || 1080;
+      const ctx = canvas.getContext('2d');
+      const draw = () => {
+        const vw = sv.videoWidth || canvas.width, vh = sv.videoHeight || canvas.height;
+        const sc = Math.min(canvas.width / vw, canvas.height / vh);
+        const dw = vw * sc, dh = vh * sc;
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(sv, (canvas.width - dw) / 2, (canvas.height - dh) / 2, dw, dh);
+      };
+      const stopTicker = startTicker(30, draw);
+      videoTrack = canvas.captureStream(30).getVideoTracks()[0];
+      cleanupDraw = () => stopTicker();
+    } else {
+      videoTrack = camStream.getVideoTracks()[0];
+    }
+  } catch (err) {
+    streams.forEach(s => s.getTracks().forEach(t => t.stop()));
+    return showErr($('errBox'), '映像の合成に失敗しました：' + err.message);
+  }
+
+  // --- 音声をミックス ---
+  // 音源が1本だけ（例: マイクのみ）ならWebAudioを通さず素のトラックを記録する。
+  // WebAudio経由は別クロック＋出力遅延が乗るため、不要なミックスは音ズレの元。
+  const finalTracks = [videoTrack];
+  const audioTracks = streams.flatMap(s => s.getAudioTracks());
+  if (audioTracks.length === 1) {
+    finalTracks.push(audioTracks[0]);
+  } else if (audioTracks.length > 1) {
+    audioCtx = new AudioContext();
+    await audioCtx.resume();
+    const dest = audioCtx.createMediaStreamDestination();
+    streams.filter(s => s.getAudioTracks().length > 0)
+      .forEach(s => audioCtx.createMediaStreamSource(s).connect(dest));
+    finalTracks.push(dest.stream.getAudioTracks()[0]);
+  }
+  const finalStream = new MediaStream(finalTracks);
+
+  // 共有停止ボタン（ブラウザUI）で止められた時
+  if (screenStream) {
+    screenStream.getVideoTracks()[0].addEventListener('ended', () => {
+      if (recorder && recorder.state !== 'inactive') stopRecording();
+    });
+  }
+
+  // --- カウントダウン ---
+  $('setupUI').style.display = 'none';
+  const ov = $('countOverlay'); ov.style.display = 'grid';
+  for (let n = 3; n >= 1; n--) {
+    $('countNum').textContent = n;
+    await new Promise(r => setTimeout(r, 1000));
+  }
+  ov.style.display = 'none';
+
+  // --- 録画開始 ---
+  chunks = [];
+  // 標準=長時間向け（2時間≈2.3GB）／高画質=短尺向け。VP9のスクリーン圧縮は2.5Mbpsで文字も十分読める
+  const vbps = mode === 'cam'
+    ? (qual === 'high' ? 4_000_000 : 1_500_000)
+    : (qual === 'high' ? 8_000_000 : 2_500_000);
+  recorder = new MediaRecorder(finalStream, {
+    mimeType: mime,
+    videoBitsPerSecond: vbps,
+  });
+  recorder.ondataavailable = ev => { if (ev.data.size) chunks.push(ev.data); };
+  recorder.onstop = () => {
+    if (cleanupDraw) cleanupDraw();
+    streams.forEach(s => s.getTracks().forEach(t => t.stop()));
+    videoTrack.stop();
+    if (audioCtx) { audioCtx.close(); audioCtx = null; }
+    finalize();
+  };
+  recorder.start(1000);
+
+  elapsed = 0; paused = false;
+  $('timer').textContent = '00:00';
+  timerInt = setInterval(() => {
+    if (!paused) {
+      elapsed++;
+      const m2 = String(Math.floor(elapsed / 60)).padStart(2, '0');
+      $('timer').textContent = `${m2}:${String(elapsed % 60).padStart(2, '0')}`;
+    }
+  }, 1000);
+  $('recUI').style.display = 'flex';
+  $('led').classList.add('on');
+  document.title = '● 録画中… — サクレコ';
+});
+
+/* ---- pause / stop ---- */
+$('pauseBtn').addEventListener('click', () => {
+  if (!recorder) return;
+  if (recorder.state === 'recording') {
+    recorder.pause(); paused = true; $('pauseBtn').textContent = '▶ 再開';
+  } else if (recorder.state === 'paused') {
+    recorder.resume(); paused = false; $('pauseBtn').textContent = '一時停止';
+  }
+});
+function stopRecording() {
+  clearInterval(timerInt);
+  if (recorder && recorder.state !== 'inactive') recorder.stop();
+}
+$('stopBtn').addEventListener('click', stopRecording);
+
+/* ---- finalize ---- */
+function finalize() {
+  $('recUI').style.display = 'none';
+  $('led').classList.remove('on');
+  document.title = 'サクレコ — 5分制限なしの画面録画・即共有';
+  blob = new Blob(chunks, { type: mime.split(';')[0] });
+  if (blobUrl) URL.revokeObjectURL(blobUrl);
+  blobUrl = URL.createObjectURL(blob);
+  const v = $('preview');
+  v.src = blobUrl;
+  v.onloadedmetadata = () => {
+    if (v.duration === Infinity || isNaN(v.duration)) {
+      // webmの再生時間メタデータ欠落への定番ワークアラウンド
+      v.currentTime = 1e7;
+      v.ontimeupdate = () => {
+        v.ontimeupdate = null;
+        duration = v.duration;
+        v.currentTime = 0;
+        setupTrim();
+      };
+    } else {
+      duration = v.duration;
+      setupTrim();
+    }
+  };
+  $('resultUI').style.display = 'block';
+  $('shareBox').style.display = 'none';
+  $('progress').style.display = 'none';
+  $('errBox2').style.display = 'none';
+  $('uploadBtn').disabled = false;
+  $('resultUI').scrollIntoView({ behavior: 'smooth' });
+}
+
+function setupTrim() {
+  $('durLabel').textContent = '録画時間 ' + fmt(duration);
+  const ts = $('trimStart'), te = $('trimEnd');
+  ts.max = te.max = duration; ts.value = 0; te.value = duration;
+  $('trimStartOut').textContent = fmt(0);
+  $('trimEndOut').textContent = fmt(duration);
+  ts.oninput = () => {
+    if (+ts.value >= +te.value - 1) ts.value = Math.max(0, +te.value - 1);
+    $('trimStartOut').textContent = fmt(+ts.value);
+    $('preview').currentTime = +ts.value;
+  };
+  te.oninput = () => {
+    if (+te.value <= +ts.value + 1) te.value = Math.min(duration, +ts.value + 1);
+    $('trimEndOut').textContent = fmt(+te.value);
+    $('preview').currentTime = +te.value;
+  };
+}
+
+/* ---- local save ---- */
+$('downloadBtn').addEventListener('click', () => {
+  const d = new Date();
+  const ts = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0')
+    + '_' + String(d.getHours()).padStart(2, '0') + String(d.getMinutes()).padStart(2, '0') + String(d.getSeconds()).padStart(2, '0');
+  const a = document.createElement('a');
+  a.href = blobUrl;
+  a.download = `sakureco_${ts}.${ext}`;
+  a.click();
+});
+
+/* ---- retry ---- */
+$('retryBtn').addEventListener('click', () => {
+  $('resultUI').style.display = 'none';
+  $('setupUI').style.display = 'block';
+  $('preview').removeAttribute('src');
+  updateCamPreview();
+});
+
+/* ---- upload & share (Cloudflare R2 マルチパートアップロード) ---- */
+const STORAGE_API = 'https://sakureco-storage.hitoshinakae.workers.dev';
+const PUB_BASE = STORAGE_API + '/file';
+const PART_SIZE = 64 * 1024 * 1024; // Workerのリクエストボディ上限(100MB)未満に収める
+
+/* ---- ログイン（合言葉ゲート） ---- */
+const KEY_LS = 'sakureco_key';
+let apiKey = localStorage.getItem(KEY_LS) || '';
+
+async function verifyKey(k) {
+  try {
+    const r = await fetch(STORAGE_API + '/auth', { method: 'POST', headers: { 'X-Sakureco-Key': k } });
+    return r.ok;
+  } catch (_) { return null; } // ネットワークエラー
+}
+
+async function lockSubmit() {
+  const k = $('lockInput').value.trim();
+  if (!k) return;
+  $('lockBtn').disabled = true;
+  const ok = await verifyKey(k);
+  $('lockBtn').disabled = false;
+  if (ok) {
+    apiKey = k;
+    localStorage.setItem(KEY_LS, k);
+    $('lockScreen').style.display = 'none';
+  } else {
+    $('lockErr').textContent = ok === null ? '通信エラーです。電波状況をご確認ください。' : '合言葉が違います。';
+    $('lockErr').style.display = 'block';
+  }
+}
+$('lockBtn').addEventListener('click', lockSubmit);
+$('lockInput').addEventListener('keydown', e => { if (e.key === 'Enter') lockSubmit(); });
+
+(async () => {
+  if (apiKey && await verifyKey(apiKey)) {
+    $('lockScreen').style.display = 'none';
+  } else {
+    if (apiKey) { localStorage.removeItem(KEY_LS); apiKey = ''; }
+    $('lockInput').focus();
+  }
+})();
+
+function xhrPut(url2, body, contentType, onLoaded) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('PUT', url2);
+    xhr.setRequestHeader('X-Sakureco-Key', apiKey);
+    if (contentType) xhr.setRequestHeader('Content-Type', contentType);
+    xhr.upload.onprogress = ev => onLoaded && onLoaded(ev.loaded);
+    xhr.onerror = () => reject(new Error('ネットワークエラー'));
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try { resolve(JSON.parse(xhr.responseText)); } catch (_) { resolve({}); }
+      } else reject(new Error('HTTP ' + xhr.status));
+    };
+    xhr.send(body);
+  });
+}
+
+async function uploadToStorage(file, key, contentType, onProgress) {
+  if (file.size <= PART_SIZE) {
+    await xhrPut(`${STORAGE_API}/put?key=${encodeURIComponent(key)}`, file, contentType,
+      loaded => onProgress(loaded, file.size));
+    return;
+  }
+  // 2時間級の大容量は64MBずつ分割アップロード（途中失敗時はそのパートだけ自動リトライ）
+  const kq = `key=${encodeURIComponent(key)}`;
+  const cr = await fetch(`${STORAGE_API}/mpu/create?${kq}&ct=${encodeURIComponent(contentType)}`, { method: 'POST', headers: { 'X-Sakureco-Key': apiKey } });
+  if (!cr.ok) throw new Error('アップロード開始に失敗（HTTP ' + cr.status + '）');
+  const { uploadId } = await cr.json();
+  const n = Math.ceil(file.size / PART_SIZE);
+  const parts = [];
+  let done = 0;
+  for (let i = 0; i < n; i++) {
+    const chunk = file.slice(i * PART_SIZE, Math.min((i + 1) * PART_SIZE, file.size));
+    const partUrl = `${STORAGE_API}/mpu/part?${kq}&uploadId=${encodeURIComponent(uploadId)}&part=${i + 1}`;
+    let part = null;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        part = await xhrPut(partUrl, chunk, null, loaded => onProgress(done + loaded, file.size));
+        break;
+      } catch (err) {
+        if (attempt === 3) throw err;
+        await new Promise(r => setTimeout(r, 2000 * attempt));
+      }
+    }
+    parts.push(part);
+    done += chunk.size;
+  }
+  const cp = await fetch(`${STORAGE_API}/mpu/complete?${kq}&uploadId=${encodeURIComponent(uploadId)}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Sakureco-Key': apiKey },
+    body: JSON.stringify({ parts }),
+  });
+  if (!cp.ok) throw new Error('アップロード完了処理に失敗（HTTP ' + cp.status + '）');
+}
+
+$('uploadBtn').addEventListener('click', async () => {
+  $('errBox2').style.display = 'none';
+  $('uploadBtn').disabled = true;
+  $('progress').style.display = 'block';
+  $('progFill').style.width = '0%';
+  $('progLabel').textContent = '準備中…';
+
+  try {
+    const d = new Date();
+    const ts = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0')
+      + '_' + String(d.getHours()).padStart(2, '0') + String(d.getMinutes()).padStart(2, '0') + String(d.getSeconds()).padStart(2, '0');
+    const rand = crypto.getRandomValues(new Uint8Array(8));
+    const suffix = [...rand].map(b => 'abcdefghijklmnopqrstuvwxyz0123456789'[b % 36]).join('');
+    const key = `rec/sakureco_${ts}_${suffix}.${ext}`;
+    const contentType = blob.type || (ext === 'mp4' ? 'video/mp4' : 'video/webm');
+
+    await uploadToStorage(blob, key, contentType, (loaded, total) => {
+      const p = Math.min(100, loaded / total * 100);
+      $('progFill').style.width = p + '%';
+      $('progLabel').textContent = `アップロード中… ${Math.round(p)}%（${(loaded / 1048576).toFixed(1)} / ${(total / 1048576).toFixed(1)} MB）`;
+    });
+
+    const u = new URL('watch.html', location.href);
+    u.searchParams.set('u', `${PUB_BASE}/${key}`);
+    const title = $('titleInput').value.trim();
+    if (title) u.searchParams.set('t', title);
+    const s = +$('trimStart').value, e2 = +$('trimEnd').value;
+    if (s > 0.4) u.searchParams.set('s', s.toFixed(1));
+    if (e2 < duration - 0.4) u.searchParams.set('e', e2.toFixed(1));
+    const link = u.toString();
+    $('shareUrl').value = link;
+    $('openBtn').href = link;
+    $('progress').style.display = 'none';
+    $('shareBox').style.display = 'block';
+    navigator.clipboard && navigator.clipboard.writeText(link).catch(() => {});
+  } catch (err) {
+    $('progress').style.display = 'none';
+    $('uploadBtn').disabled = false;
+    if (String(err.message).includes('401')) {
+      localStorage.removeItem(KEY_LS); apiKey = '';
+      $('lockScreen').style.display = 'grid';
+      showErr($('errBox2'), '認証が切れました。合言葉を入力し直してから、もう一度リンクを発行してください（録画データは消えていません）。');
+    } else {
+      showErr($('errBox2'), 'アップロードに失敗しました：' + err.message + ' — 時間をおいて再度お試しください。');
+    }
+  }
+});
+
+$('copyBtn').addEventListener('click', () => {
+  navigator.clipboard.writeText($('shareUrl').value);
+  $('copyBtn').textContent = '✓ コピー済み';
+  setTimeout(() => $('copyBtn').textContent = 'コピー', 1600);
+});
+})();
+</script>
+</body>
+</html>
