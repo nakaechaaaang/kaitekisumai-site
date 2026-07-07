@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>サーフィン気象予報 | Surf Forecast Japan</title>
+<meta name="description" content="日本各地のサーフスポットの波・風・気象予報を確認できるアプリです。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+
+  <header class="app-header">
+    <div class="brand">
+      <span class="brand-wave">🌊</span>
+      <div>
+        <h1>サーフィン気象予報</h1>
+        <p class="brand-sub">Surf Forecast Japan</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-main">
+
+    <section class="search-panel">
+      <form id="searchForm" class="search-form" autocomplete="off">
+        <input type="text" id="searchInput" placeholder="地名・海岸名で検索（例：一宮、鵠沼、日南）" />
+        <button type="submit">検索</button>
+      </form>
+      <div id="searchResults" class="search-results hidden"></div>
+
+      <div class="spot-chips" id="spotChips"></div>
+    </section>
+
+    <section id="statusArea" class="status-area hidden"></section>
+
+    <section id="currentCard" class="current-card hidden">
+      <div class="current-top">
+        <div>
+          <h2 id="spotName">--</h2>
+          <p id="spotUpdated" class="muted"></p>
+        </div>
+        <div class="score-badge" id="scoreBadge">
+          <span id="scoreLabel">--</span>
+        </div>
+      </div>
+      <div class="current-metrics" id="currentMetrics"></div>
+    </section>
+
+    <section id="hourlySection" class="hourly-section hidden">
+      <h3>本日の時間別予報</h3>
+      <div class="hourly-scroll" id="hourlyScroll"></div>
+    </section>
+
+    <section id="dailySection" class="daily-section hidden">
+      <h3>3日間の予報</h3>
+      <div class="daily-grid" id="dailyGrid"></div>
+    </section>
+
+  </main>
+
+  <footer class="app-footer">
+    <p>気象・海洋データ: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>（無料・APIキー不要）</p>
+  </footer>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

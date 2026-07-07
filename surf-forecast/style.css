@@ -1,0 +1,278 @@
+/* =====================================================
+   サーフィン気象予報 - Surf Forecast Japan
+   ===================================================== */
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --ocean-deep: #073b4c;
+  --ocean: #118ab2;
+  --ocean-light: #73c2e8;
+  --foam: #edf9ff;
+  --sand: #f4e9d8;
+  --accent: #06d6a0;
+  --warn: #ffd166;
+  --danger: #ef476f;
+  --text: #0b2530;
+  --text-light: #4a6572;
+  --white: #fff;
+  --shadow: 0 8px 28px rgba(7, 59, 76, 0.12);
+  --radius: 16px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+  color: var(--text);
+  background: linear-gradient(180deg, var(--ocean-deep) 0%, var(--ocean) 45%, var(--foam) 45%, var(--foam) 100%);
+  background-attachment: fixed;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--ocean-deep); }
+
+.app {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 16px 48px;
+}
+
+/* Header */
+.app-header {
+  padding: 32px 4px 20px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--white);
+}
+.brand-wave { font-size: 40px; line-height: 1; }
+.brand h1 { font-size: 22px; font-weight: 700; letter-spacing: .02em; }
+.brand-sub {
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  letter-spacing: .12em;
+  opacity: .85;
+}
+
+/* Search panel */
+.search-panel {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px;
+  margin-bottom: 18px;
+}
+.search-form {
+  display: flex;
+  gap: 8px;
+}
+.search-form input {
+  flex: 1;
+  padding: 12px 14px;
+  border: 1px solid #d8e6ec;
+  border-radius: 10px;
+  font-size: 15px;
+  font-family: inherit;
+}
+.search-form input:focus { outline: 2px solid var(--ocean-light); }
+.search-form button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  background: var(--ocean);
+  color: var(--white);
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background .2s;
+}
+.search-form button:hover { background: var(--ocean-deep); }
+
+.search-results {
+  margin-top: 10px;
+  border: 1px solid #e3edf1;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.search-results.hidden { display: none; }
+.search-result-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  border: none;
+  background: var(--white);
+  font-size: 14px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f4f6;
+  font-family: inherit;
+  color: var(--text);
+}
+.search-result-item:last-child { border-bottom: none; }
+.search-result-item:hover { background: var(--foam); }
+.search-result-item .sub { color: var(--text-light); font-size: 12px; }
+
+.spot-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+.spot-chip {
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: var(--foam);
+  border: 1px solid #cfe6ef;
+  color: var(--ocean-deep);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background .15s, transform .1s;
+}
+.spot-chip:hover { background: #d7f0f8; }
+.spot-chip:active { transform: scale(.97); }
+.spot-chip.active {
+  background: var(--ocean);
+  color: var(--white);
+  border-color: var(--ocean);
+}
+
+/* Status */
+.status-area {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px;
+  margin-bottom: 18px;
+  text-align: center;
+  color: var(--text-light);
+}
+.status-area.hidden { display: none; }
+.status-area.error { color: var(--danger); }
+
+/* Current conditions card */
+.current-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin-bottom: 18px;
+}
+.current-card.hidden { display: none; }
+.current-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+#spotName { font-size: 20px; font-weight: 700; }
+.muted { color: var(--text-light); font-size: 12px; margin-top: 2px; }
+
+.score-badge {
+  min-width: 84px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--white);
+  background: var(--ocean);
+  white-space: nowrap;
+}
+.score-badge.score-poor { background: #9aa5ab; }
+.score-badge.score-fair { background: var(--warn); color: var(--text); }
+.score-badge.score-good { background: var(--ocean); }
+.score-badge.score-great { background: var(--accent); }
+
+.current-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+.metric {
+  background: var(--foam);
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+}
+.metric .metric-label {
+  font-size: 11px;
+  color: var(--text-light);
+  margin-bottom: 4px;
+}
+.metric .metric-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ocean-deep);
+}
+.metric .metric-unit { font-size: 12px; font-weight: 400; margin-left: 2px; }
+
+/* Hourly */
+.hourly-section, .daily-section {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px;
+  margin-bottom: 18px;
+}
+.hourly-section.hidden, .daily-section.hidden { display: none; }
+.hourly-section h3, .daily-section h3 {
+  font-size: 15px;
+  margin-bottom: 12px;
+  color: var(--ocean-deep);
+}
+.hourly-scroll {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.hour-card {
+  flex: 0 0 auto;
+  width: 92px;
+  background: var(--foam);
+  border-radius: 12px;
+  padding: 10px 8px;
+  text-align: center;
+}
+.hour-card .hour-time { font-size: 12px; font-weight: 700; color: var(--ocean-deep); }
+.hour-card .hour-wave { font-size: 16px; font-weight: 700; margin: 6px 0 2px; }
+.hour-card .hour-sub { font-size: 11px; color: var(--text-light); }
+
+/* Daily */
+.daily-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+.day-card {
+  background: var(--foam);
+  border-radius: 12px;
+  padding: 14px;
+}
+.day-card .day-name { font-weight: 700; color: var(--ocean-deep); margin-bottom: 8px; }
+.day-card .day-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 2px 0;
+  color: var(--text-light);
+}
+.day-card .day-row strong { color: var(--text); }
+
+/* Footer */
+.app-footer {
+  text-align: center;
+  color: var(--text-light);
+  font-size: 12px;
+  padding-top: 12px;
+}
+
+@media (max-width: 480px) {
+  .app { padding: 0 10px 40px; }
+  .current-metrics { grid-template-columns: repeat(2, 1fr); }
+}
